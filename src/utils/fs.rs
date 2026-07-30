@@ -83,7 +83,7 @@ pub fn get_icons_location() -> Option<String>  {
             return Some(dir);
         }
 
-        clone_dir.push("../share/tuxrigup/icons");
+        clone_dir.push("../share/tuxrigup/images");
         let clone_dir = clone_dir.to_string_lossy().into_owned();
         if is_dir(&clone_dir,true) {
             return Some(clone_dir);

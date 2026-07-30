@@ -1,0 +1,40 @@
+# ملفات سطح المكتب
+install_data(
+  'com.github.yucefsourani.tuxrigup.desktop',
+  install_dir: datadir / 'applications'
+)
+
+install_data(
+  'com.github.yucefsourani.tuxrigup.appdata.xml',
+  install_dir: datadir / 'metainfo'
+)
+
+install_data(
+  'com.github.yucefsourani.tuxrigup.gschema.xml',
+  install_dir: datadir / 'glib-2.0' / 'schemas'
+)
+
+# أيقونات التطبيق بمقاساتها المختلفة
+icon_sizes = ['8', '16', '20', '22', '24', '32', '36', '40', '42', '48', '64', '72', '96', '128', '192', '256', '512']
+foreach i : icon_sizes
+  install_data(
+    'icons/hicolor' / i + 'x' + i / 'apps/com.github.yucefsourani.tuxrigup.png',
+    install_dir: datadir / 'icons/hicolor' / i + 'x' + i / 'apps'
+  )
+endforeach
+
+install_data(
+  'icons/hicolor/scalable/apps/com.github.yucefsourani.tuxrigup.svg',
+  install_dir: datadir / 'icons/hicolor/scalable/apps'
+)
+
+install_data(
+  'icons/hicolor/symbolic/apps/com.github.yucefsourani.tuxrigup-symbolic.svg',
+  install_dir: datadir / 'icons/hicolor/symbolic/apps'
+)
+
+# نقل الأيقونة المحددة إلى مسار pixmaps
+install_data(
+  'icons/hicolor/com.github.yucefsourani.tuxrigup.png',
+  install_dir: datadir / 'pixmaps'
+)

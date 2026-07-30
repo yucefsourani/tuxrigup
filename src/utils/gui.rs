@@ -163,9 +163,23 @@ pub fn create_plugin_button(
         let c4_non_queue_task_running_state = Arc::clone(&c3_non_queue_task_running_state);
         let progressbar2 = progressbar1.clone();
         let c_b_label = c2_b_label.clone();
-        glib::MainContext::default().spawn_local(async move { 
-            let dialog_header = plugin_clone4.lock().unwrap().metadata().yes_or_no_header;
-            let dialog_label  = plugin_clone4.lock().unwrap().metadata().yes_or_no_label;
+        glib::MainContext::default().spawn_local(async move {
+            let (dialog_header, dialog_label) = {
+                let guard    = plugin_clone4.lock().unwrap();
+                let is_need_install: bool = guard.get_need_install();
+                let metadata =  guard.metadata();
+                if is_need_install{
+                    (
+                        metadata.install_yes_or_no_header,
+                        metadata.install_yes_or_no_label
+                    )
+                }else {
+                    (
+                        metadata.remove_yes_or_no_header,
+                        metadata.remove_yes_or_no_label
+                    )
+                }
+            };
             if plugin_clone4.lock().unwrap().metadata().yes_or_no {
                 let yes_or_no_dialog = adw::AlertDialog::new(Some(dialog_header), Some(dialog_label));
                 yes_or_no_dialog.add_response("No", "No");
@@ -522,9 +536,22 @@ pub fn queue_create_plugin_button(
         if _plugin_clone.lock().unwrap().get_install_is_running() == false{
             let progressbar_clone3 = progressbar_clone2.clone();
             glib::MainContext::default().spawn_local(async move { 
-                
-                let dialog_header = _plugin_clone.lock().unwrap().metadata().yes_or_no_header;
-                let dialog_label  = _plugin_clone.lock().unwrap().metadata().yes_or_no_label;
+                let (dialog_header, dialog_label) = {
+                    let guard    = _plugin_clone.lock().unwrap();
+                    let is_need_install: bool = guard.get_need_install();
+                    let metadata =  guard.metadata();
+                    if is_need_install{
+                        (
+                            metadata.install_yes_or_no_header,
+                            metadata.install_yes_or_no_label
+                        )
+                    }else {
+                        (
+                            metadata.remove_yes_or_no_header,
+                            metadata.remove_yes_or_no_label
+                        )
+                    }
+                };
                 if _plugin_clone.lock().unwrap().metadata().yes_or_no {
                     let yes_or_no_dialog = adw::AlertDialog::new(Some(dialog_header), Some(dialog_label));
                     yes_or_no_dialog.add_response("No", "No");

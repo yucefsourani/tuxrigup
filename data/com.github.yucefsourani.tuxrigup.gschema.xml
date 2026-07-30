@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="tuxrigup">
+	<schema id="com.github.yucefsourani.tuxrigup" path="/com/github/yucefsourani/tuxrigupe/">
+    <key name="width" type="i">
+      <default>640</default>
+    </key>
+    <key name="height" type="i">
+      <default>480</default>
+    </key>
+    <key name="is-maximized" type="b">
+      <default>true</default>
+    </key>
+    <key name="is-fullscreen" type="b">
+      <default>false</default>
+    </key>
+    <key name="visible-stack-child" type="s">
+      <default>"mhbox"</default>
+    </key>
+    <key name="navigation-sidebar-visible-stack-child" type="s">
+      <default>"Multimedia"</default>
+    </key>
+  </schema>
+</schemalist>

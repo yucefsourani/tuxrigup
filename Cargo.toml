@@ -1,0 +1,19 @@
+[package]
+name = "gtk4_ex"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+gettext-rs = { version = "0.7.7", features = ["gettext-system"] }
+gtk = { version = "0.11.4", package = "gtk4", features = ["gnome_50"] }
+glib = { version = "0.20", features = ["v2_68"] }
+futures = "0.3"
+gio = "0.19"
+tempfile = "3"
+gdk4 = "0.9"
+reqwest = "0.11"
+tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
+[dependencies.adw]
+package = "libadwaita"
+version = "0.9.1"
+features = ["v1_9"]

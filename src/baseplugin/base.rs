@@ -226,8 +226,20 @@ pub struct DnfInstaller {
 impl PluginTools for DnfInstaller {
     fn need_install(&self) -> bool {
         for package_name in self.packages_name {
-            if utils::command::run_command(&format!("rpm -q {}",package_name)) == false {
-                return true;
+            if package_name.starts_with("/") {
+                if package_name.ends_with("/") {
+                    if  !utils::fs::is_dir(package_name,true) {
+                         return true;
+                    }
+                }else{
+                    if  !utils::fs::is_file(package_name,true) {
+                         return true;
+                    }
+                }
+            }else{
+                if utils::command::run_command(&format!("rpm -q {}",package_name)) == false {
+                    return true;
+                }
             }
         }
         false
@@ -390,8 +402,20 @@ pub struct FlatpakInstaller {
 impl PluginTools for FlatpakInstaller {
     fn need_install(&self) -> bool {
         for package_name in self.packages_name {
-            if utils::command::run_command(&format!("flatpak list info {}",package_name)) == false {
-                return true;
+            if package_name.starts_with("/") {
+                if package_name.ends_with("/") {
+                    if  !utils::fs::is_dir(package_name,true) {
+                         return true;
+                    }
+                }else{
+                    if  !utils::fs::is_file(package_name,true) {
+                         return true;
+                    }
+                }
+            }else{
+                if utils::command::run_command(&format!("flatpak list info {}",package_name)) == false {
+                    return true;
+                }
             }
         }
     false
@@ -535,8 +559,20 @@ pub struct CustomInstaller {
 impl PluginTools for CustomInstaller {
     fn need_install(&self) -> bool {
         for c in self.commands_to_check {
-            if utils::command::run_command(&format!("{}",c)) == false {
-                return true;
+            if c.starts_with("/") {
+                if c.ends_with("/") {
+                    if  !utils::fs::is_dir(c,true) {
+                         return true;
+                    }
+                }else{
+                    if  !utils::fs::is_file(c,true) {
+                         return true;
+                    }
+                }
+            }else{
+                if utils::command::run_command(&format!("{}",c)) == false {
+                    return true;
+                }
             }
         }
     false

@@ -1,4 +1,4 @@
-use crate::baseplugin::base::{PluginMetaData,Category,PluginType,DnfInstaller,CustomInstaller,DownloadTask};
+use crate::baseplugin::base::{PluginMetaData,Category,PluginType,CustomInstaller,DownloadTask};
 use std::sync::{Arc,Mutex};
 
 

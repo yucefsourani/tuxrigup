@@ -335,20 +335,20 @@ fn main() {
                                     if command.starts_with("/usr/bin/flatpak") || command.starts_with("/bin/flatpak") {
                                         if let Some(command) = app_i.commandline() {
                                             let command_for_closure = command.clone();
-                                            b.connect_clicked(move |button| {
+                                            b.connect_clicked(move |_button| {
                                                 let cmd_string = command_for_closure.to_string_lossy();
-                                                let result = Command::new("sh")
+                                                let _result = Command::new("sh")
                                                                         .arg("-c")
-                                                                        .arg(&*cmd_string) // تمرير النص كـ string slice
+                                                                        .arg(&*cmd_string)
                                                                         .spawn();
                                             });
                                         
                                         }
                                     }else {
                                         let command_for_closure = command.clone();
-                                        b.connect_clicked(move |button| {
+                                        b.connect_clicked(move |_button| {
                                             let cmd_string = command_for_closure.to_string_lossy();
-                                            let result = Command::new("sh")
+                                            let _result = Command::new("sh")
                                                                     .arg("-c")
                                                                     .arg(&*cmd_string) // تمرير النص كـ string slice
                                                                     .spawn();

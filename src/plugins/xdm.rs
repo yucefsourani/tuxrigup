@@ -40,7 +40,7 @@ pub fn get_plugin() -> CustomInstaller {
                                     };
 
    CustomInstaller::create(metadataplugin,
-                         &["ls /opt/xdman/uninstall.sh"],
+                         &["/opt/xdman/uninstall.sh"],
                          &["tar -xJf \"$TARGET_FILE1\" -C  \"$TARGET_DIR1\"","chmod 755  \"$TARGET_DIR1\"/install.sh","pkexec \"$TARGET_DIR1\"/install.sh"],
                          &["pkexec chmod 755 /opt/xdman/uninstall.sh", "pkexec /opt/xdman/uninstall.sh"],
                          Box::new([Arc::new(Mutex::new(Some(download_task1)))])

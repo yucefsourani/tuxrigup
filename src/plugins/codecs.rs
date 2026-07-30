@@ -1,5 +1,4 @@
-use crate::baseplugin::base::{PluginMetaData,Category,PluginType,DnfInstaller,CustomInstaller,DownloadTask};
-use std::sync::{Arc,Mutex};
+use crate::baseplugin::base::{PluginMetaData,Category,PluginType,CustomInstaller};
 
 
 
@@ -39,16 +38,6 @@ pub fn get_plugin() -> CustomInstaller {
                          &["sleep 10"],
                          &["echo hello22222222222222"]
                          )*/
-    let download_task1 = DownloadTask {
-                                        link: "https://github.com/Hamza5/Learn-to-program-with-C_AR/releases/download/v1.0.1/Learn_C_Language_v1.0.1.pdf?v=123",
-                                        dir_download_location: Some("/tmp".to_string()),
-                                        file_name: "Learn_C_Language_v1.0.1.pdf",
-                                    };
-    let download_task2 = DownloadTask{
-                                        link: "https://github.com/Hamza5/Learn-to-program-with-C_AR/releases/download/v1.0.1/Learn_C_Language_v1.0.1.pdf?v=123",
-                                        dir_download_location: Some("/tmp".to_string()),
-                                        file_name: "Learn_C_Language_v2.0.1.pdf",
-                                    };
    CustomInstaller::create(metadataplugin,
                          &["false"],
                          &["sleep 5"],

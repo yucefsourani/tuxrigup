@@ -5,6 +5,7 @@ use std::cell::{RefCell,Cell};
 use std::rc::Rc;
 use std::collections::HashMap;
 use gio::prelude::AppInfoExt;
+use adw::prelude::SettingsExtManual;
 use std::process::Command;
 use gio::prelude::IconExt;
 
@@ -20,6 +21,7 @@ pub static DISPLAY_TYPE: OnceLock<String> = OnceLock::new();
 pub static CONFIGDIR: OnceLock<String> = OnceLock::new();
 pub static HOMEDIR: OnceLock<String> = OnceLock::new();
 pub const  CURRENT_ARCH: &str = std::env::consts::ARCH;
+pub const  VERSION: &str = "1.0";
 
 pub const CSS: &str  = "
 .wait-action-button,
@@ -138,7 +140,12 @@ fn main() {
 
         let all_plugin = get_all_plugins();
         let mainwindow = adw::ApplicationWindow::builder().application(app).title("Gtk4 Example").build();
-        
+
+        let settings  =  adw::gio::Settings::with_path("com.github.yucefsourani.tuxrigup","/com/github/yucefsourani/tuxrigupe/");
+        settings.bind("width",&mainwindow,"default-width").build();
+        settings.bind("height",&mainwindow,"default-height").build();
+        settings.bind("is-maximized",&mainwindow,"maximized").build();
+        settings.bind("is-fullscreen",&mainwindow,"fullscreened").build();
         let toastoverlay = adw::ToastOverlay::new();
         mainwindow.set_content(Some(&toastoverlay));
 
@@ -148,7 +155,28 @@ fn main() {
         
         let headerbar = gtk::HeaderBar::new();
         toolbarview.add_top_bar(&headerbar);
+
+
+        let about_dialog = adw::AboutDialog::new();
+        about_dialog.set_application_icon("com.github.yucefsourani.tuxrigup");
+        about_dialog.set_application_name("TuxRigUp");
+        about_dialog.set_copyright("© 2026 Yucef");
+        about_dialog.set_developer_name("Yucef Sourani");
+        about_dialog.set_license_type(gtk::License::Gpl30);
+        about_dialog.set_version(VERSION);
+        about_dialog.set_website("https://github.com/yucefsourani/tuxrigup");
+        about_dialog.set_support_url("https://github.com/yucefsourani/tuxrigup");
+        about_dialog.set_developers(
+                                     &["yucef mouhammad nazih  sourani"]
+                                    );
+        let top_about_button = gtk::Button::from_icon_name("help-about-symbolic");
         
+        let c1_about_dialog = about_dialog.clone();
+        let c1_main_window = mainwindow.clone();
+        top_about_button.connect_clicked(move|_button| {
+            c1_about_dialog.present(Some(&c1_main_window));
+            });
+        headerbar.pack_end(&top_about_button);
         
         let view_switcher_bar   = adw::ViewSwitcherBar::new();
         let viewswitcher        = adw::ViewSwitcher::new();
@@ -207,10 +235,13 @@ fn main() {
         
         
         let output_box_page  = gtk::Box::new(gtk::Orientation::Vertical, 0);
-        let about_box_page   = gtk::Box::new(gtk::Orientation::Vertical, 0);
+        //let about_box_page   = gtk::Box::new(gtk::Orientation::Vertical, 0);
         let _ = mainstack.add_titled_with_icon(&main_box_page,Some("mhbox"),"Main","application-x-executable-symbolic");
         let _ = mainstack.add_titled_with_icon(&output_box_page,Some("output"),"Output","utilities-terminal-symbolic");
-        let _ = mainstack.add_titled_with_icon(&about_box_page,Some("about"),"About","help-about-symbolic");
+        //let _ = mainstack.add_titled_with_icon(&about_box_page,Some("about"),"About","help-about-symbolic");
+        settings.bind("visible-stack-child", &mainstack, "visible-child-name").build();
+        
+
             
 
         let text_view = gtk::TextView::new();
@@ -330,7 +361,7 @@ fn main() {
                                     if let Some(subtitle) = app_i.description() {
                                         action_row.set_subtitle(&subtitle);
                                     }
-                                    let b = gtk::Button::with_label("Launche");
+                                    let b = gtk::Button::with_label("Launch");
                                     let command = app_i.executable();
                                     if command.starts_with("/usr/bin/flatpak") || command.starts_with("/bin/flatpak") {
                                         if let Some(command) = app_i.commandline() {

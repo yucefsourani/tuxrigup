@@ -1,5 +1,5 @@
 Name:           tuxrigup
-Version:        0.1.0
+Version:        1.0
 Release:        1%{?dist}
 Summary:        The Essential Post-Setup & Workstation Tuning Suite for Linux
 
@@ -52,5 +52,5 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/com.githu
 %{_datadir}/tuxrigup/
 
 %changelog
-* Thu Jul 30 2026 Yucef Sourani <yucefsourani@gmail.com> - 0.1.0-1
+* Thu Jul 30 2026 Yucef Sourani <yucefsourani@gmail.com> - 1.0-1
 - Initial release.

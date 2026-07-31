@@ -62,16 +62,5 @@ pub fn get_plugin() -> CustomInstaller {
 
 
 }
-/*
-    
-    fix launcher plugin icons 
-    
-    about 
-    
-    settings
-    
-    
 
- 
- */
  

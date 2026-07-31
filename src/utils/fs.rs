@@ -77,7 +77,7 @@ pub fn get_icons_location() -> Option<String>  {
     if let Some(mut dir) = get_exe_dir() {
         let mut clone_dir = dir.clone();
         
-        dir.push("../../icons");
+        dir.push("../../images");
         let dir = dir.to_string_lossy().into_owned();
         if is_dir(&dir,true) {
             return Some(dir);

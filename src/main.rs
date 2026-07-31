@@ -119,6 +119,9 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::firefox::get_plugin()),
         Box::new(plugins::xdm::get_plugin()),
         Box::new(plugins::xterm::get_plugin()),
+        Box::new(plugins::xterm::get_plugin()),
+        Box::new(plugins::xterm::get_plugin()),
+        Box::new(plugins::xterm::get_plugin()),
         Box::new(plugins::codecs::get_plugin()),
         // ... بقية الـ plugins تظل كما هي
     ]

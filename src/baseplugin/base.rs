@@ -296,6 +296,9 @@ impl PluginTools for DnfInstaller {
             vec_command.push(format!("{}",co));
         }
         for c in self.packages_name {
+            if c.starts_with("/") || c.ends_with("/") {
+                continue;
+            } 
             if utils::command::run_command(&format!("rpm -q {}",c)) == false {
                 vec_command.push(format!("pkexec dnf install {} -y",c));
             }
@@ -324,8 +327,11 @@ impl PluginTools for DnfInstaller {
     fn remove(&self,sender:UnboundedSender<OutMesseageType>,cancellable:gio::Cancellable) {
         let mut vec_command: Vec<String> = Vec::new();
         for c in self.packages_name {
-            if utils::command::run_command(&format!("rpm -q {}",c)) == true {            
-                vec_command.push(format!("pkexec rpm -ev  {} --nodeps",c));
+            if c.starts_with("/") || c.ends_with("/") {
+                continue;
+            } 
+            if utils::command::run_command(&format!("rpm -q {}",c)) == true {        
+                vec_command.push(format!("pkexec rpm -ev  {} --nodeps --quiet",c));
             }
         }
         if vec_command.len() == 1 {
@@ -415,7 +421,7 @@ impl PluginTools for FlatpakInstaller {
                     }
                 }
             }else{
-                if utils::command::run_command(&format!("flatpak list info {}",package_name)) == false {
+                if !utils::command::run_command(&format!("flatpak  info {}",package_name)) {
                     return true;
                 }
             }
@@ -459,7 +465,10 @@ impl PluginTools for FlatpakInstaller {
             vec_command.push(format!("{}",co));
         }
         for package_name in self.packages_name {
-            vec_command.push(format!("flatpak  --user install flathup {} -y",package_name));
+            if package_name.starts_with("/") || package_name.ends_with("/") {
+                continue;
+            } 
+            vec_command.push(format!("flatpak  --user install flathub {} -y ",package_name));
         }
         for co in self.run_commands_after {
             vec_command.push(format!("{}",co));
@@ -484,7 +493,10 @@ impl PluginTools for FlatpakInstaller {
     fn remove(&self,sender:UnboundedSender<OutMesseageType>,cancellable:gio::Cancellable) {
         let mut vec_command: Vec<String> = Vec::new();
         for package_name in self.packages_name {
-            vec_command.push(format!("flatpak  --user uninstall flathup {} -y",package_name));
+            if package_name.starts_with("/") || package_name.ends_with("/") {
+                continue;
+            } 
+            vec_command.push(format!("flatpak  --user uninstall  {} -y --noninteractive",package_name));
         }
         if vec_command.len() == 1 {
             utils::command::run_command_async_with_output(&vec_command[0],sender.clone(),cancellable);

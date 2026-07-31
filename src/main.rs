@@ -118,6 +118,7 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         //Box::new(plugins::xterm::XtermPlugin::create()),
         Box::new(plugins::firefox::get_plugin()),
         Box::new(plugins::xdm::get_plugin()),
+        Box::new(plugins::albasheer::get_plugin()),
         Box::new(plugins::xterm::get_plugin()),
         Box::new(plugins::xterm::get_plugin()),
         Box::new(plugins::xterm::get_plugin()),
@@ -254,7 +255,6 @@ fn main() {
         text_view.set_margin_end(5);
         text_view.set_editable(false);
         text_view.set_wrap_mode(gtk::WrapMode::Word);
-        let text_view_buffer = text_view.buffer();
         let text_view_scrolled_window = gtk::ScrolledWindow::new();
         text_view_scrolled_window.set_hscrollbar_policy(gtk::PolicyType::Automatic);
         text_view_scrolled_window.set_vscrollbar_policy(gtk::PolicyType::Automatic);
@@ -491,7 +491,7 @@ fn main() {
                         plugin_arc,
                         Rc::clone(&lazy_fn_vec),
                         clone_click_handler_count,
-                        text_view_buffer.clone(),
+                        text_view.clone(),
                         spinner.clone(),
                         toastoverlay.clone()
                     );
@@ -563,7 +563,7 @@ fn main() {
                     action_row.set_title(metadata.title);
                     action_row.set_subtitle(metadata.subtitle);
                     let spinner = gtk::Spinner::new();
-                    let b = utils::gui::create_plugin_button(&mainwindow,plugin_arc,text_view_buffer.clone(),spinner.clone(),toastoverlay.clone(),Arc::clone(&non_queue_task_running_state));
+                    let b = utils::gui::create_plugin_button(&mainwindow,plugin_arc,text_view.clone(),spinner.clone(),toastoverlay.clone(),Arc::clone(&non_queue_task_running_state));
                     let spinner_button_box = gtk::Box::new(gtk::Orientation::Horizontal,2);
                     spinner_button_box.set_valign(gtk::Align::Center);
                     spinner_button_box.append(&spinner);

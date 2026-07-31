@@ -308,113 +308,16 @@ pub fn run_command_async_with_output(command: &str, sender: UnboundedSender<OutM
 }
 
 
-/*pub fn __run_command_async_with_output(command: &str,sender:UnboundedSender<String>)  {
-    let vec_command: Vec<&OsStr> =  command.split_whitespace().map(|s| OsStr::new(s)).collect();
-    if let Ok(process) =  gio::Subprocess::newv(&vec_command,gio::SubprocessFlags::STDERR_MERGE | gio::SubprocessFlags::STDOUT_PIPE){
-        if let Some(stdout_stream) = process.stdout_pipe() {
-            let data_stream = gio::DataInputStream::new(&stdout_stream);
-
-            fn read_next_line(stream: gio::DataInputStream, p_control: gio::Subprocess,sender:UnboundedSender<String>)  {
-                let clone_sender = sender.clone();
-                stream.clone().read_line_async(
-                    gio::glib::Priority::default(),
-                    None as Option<&gio::Cancellable>,
-                    move |res| {
-                        match res {
-                            Ok(line_bytes) => {
-                                if p_control.has_exited() {
-                                    if p_control.exit_status() == 0 {
-                                        clone_sender.unbounded_send("_-TRUE-_".to_string()).unwrap();
-                                    }else {
-                                        clone_sender.unbounded_send("_-FALSE-_".to_string()).unwrap();
-                                    }
-                                }
-                                
-                                let line = String::from_utf8_lossy(&line_bytes);
-                                //println!("{}", line);
-                                clone_sender.unbounded_send(line.to_string()).unwrap();
-
-                                let clone2_tx = clone_sender.clone();
-                                read_next_line(stream, p_control,clone2_tx);
-                            }
-                            Err(e) => {
-                                eprintln!("Error reading line: {:?}", e);
-                                clone_sender.unbounded_send("_-ERROR-_".to_string()).unwrap();
-                            }
-                        }
-                    },
-                );
-            }
-        let clone_tx = sender.clone();
-        read_next_line(data_stream, process,clone_tx);
-        }
-    }
-}*/
-
-
-
-
-/*pub fn run_command_async(command: &str) -> bool {
-    let vec_command: Vec<&OsStr> =  command.split_whitespace().map(|s| OsStr::new(s)).collect();
-    let mut to_return: bool = false;
-    
-    if let Ok(process) =  gio::Subprocess::newv(&vec_command,gio::SubprocessFlags::STDOUT_PIPE | gio::SubprocessFlags::STDERR_PIPE){
-        let process_clone = process.clone();
-        process.communicate_utf8_async(None,gio::Cancellable::NONE, move |result| {
-            match result {
-                    Ok((stdout, stderr)) => {
-                        if let Some(out_s) = stdout {
-                            let out_str = String::from_utf8_lossy(out_s.as_ref());
-                            println!("STDOUT: {}", out_str);
-                        }
-                        if let Some(err_s) = stderr {
-                            let err_str = String::from_utf8_lossy(err_s.as_ref());
-                            eprintln!("STDERR: {}", err_str);
-                        }
-                                                    println!("{}",process_clone.has_exited());
-                            println!("{}",process_clone.exit_status());
-                        if process_clone.has_exited(){
-                            println!("{}",process_clone.has_exited());
-                            println!("{}",process_clone.exit_status());
-                            if process_clone.exit_status() == 0 {
-                                to_return =  true;
-                            }else {
-                                to_return =  false;
-                            }
-                        }
-                    }
-                    Err(err) => eprintln!("Error reading pipes: {:?}", err),
-                
-                }
-            
-            });
-    }
-    println!("{}",to_return);
-    to_return
-    
-}*/
 
 pub fn run_command(command: &str) -> bool {
-    let vec_command: Vec<&OsStr> =  command.split_whitespace().map(|s| OsStr::new(s)).collect();
-    //if let Ok(process) =  gio::Subprocess::newv(&vec_command,gio::SubprocessFlags::STDOUT_PIPE | gio::SubprocessFlags::STDERR_PIPE){
-    if let Ok(process) =  gio::Subprocess::newv(&vec_command,gio::SubprocessFlags::NONE){
-        match  process.communicate_utf8(None,gio::Cancellable::NONE){
-            Ok((_stdout,_sterr)) =>{
-                    if process.exit_status() == 0 {
-                        return true;
-                    }else {
-                        return false;
-                    }
-                    /*if let Some(output) = stdout {
-                        return true;
-                    }else{
-                        return false;
-                    }*/
-                },
-           Err(err) => {
-                eprintln!("Error communicating with subprocess: {}",err);
-                }
-            }
+    let vec_command: Vec<&OsStr> = command.split_whitespace().map(OsStr::new).collect();
+    let flags = gio::SubprocessFlags::STDOUT_SILENCE | gio::SubprocessFlags::STDERR_SILENCE;
+    
+    if let Ok(process) = gio::Subprocess::newv(&vec_command, flags) {
+        if process.wait(gio::Cancellable::NONE).is_ok() {
+            return process.exit_status() == 0;
+        }
     }
+    
     false
 }

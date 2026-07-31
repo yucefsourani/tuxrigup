@@ -9,6 +9,72 @@ use adw::prelude::*;
 use crate::baseplugin;
 use gio::prelude::CancellableExt;
 
+pub fn append_text_with_smart_scroll(text_view: &gtk::TextView, new_text: &str) {
+    // 1. التحقق من حالة التمرير قبل إدراج النص
+    let is_at_bottom = if let Some(vadj) = text_view.vadjustment() {
+        // أقصى قيمة يمكن أن يصل إليها شريط التمرير
+        let max_value = vadj.upper() - vadj.page_size();
+        let current_value = vadj.value();
+        
+        // استخدام هامش خطأ بسيط (2.0 بكسل) لتفادي مشاكل الأرقام العشرية (Float precision)
+        max_value - current_value <= 2.0
+    } else {
+        true // إذا لم نتمكن من الحصول على الشريط، نفعل التمرير كخيار افتراضي
+    };
+
+    // 2. إدراج النص الجديد
+    let buffer = text_view.buffer();
+    let mut iter = buffer.end_iter();
+    buffer.insert(&mut iter, new_text);
+
+    // 3. التمرير فقط إذا كان المستخدم عند النهاية مسبقاً
+    if is_at_bottom {
+        let end_iter = buffer.end_iter();
+        buffer.place_cursor(&end_iter);
+        
+        if let Some(mark) = buffer.mark("insert") {
+            text_view.scroll_to_mark(
+                &mark, 
+                0.0, 
+                true, 
+                0.0, 
+                1.0
+            );
+        }
+    }
+}
+
+pub fn append_markup_with_smart_scroll(text_view: &gtk::TextView, markup_text: &str) {
+    // 1. التحقق من حالة التمرير
+    let is_at_bottom = if let Some(vadj) = text_view.vadjustment() {
+        let max_value = vadj.upper() - vadj.page_size();
+        let current_value = vadj.value();
+        max_value - current_value <= 2.0
+    } else {
+        true
+    };
+
+    // 2. إدراج النص بصيغة Markup
+    let buffer = text_view.buffer();
+    let mut iter = buffer.end_iter();
+    buffer.insert_markup(&mut iter, markup_text);
+
+    // 3. التمرير إذا كان المستخدم عند النهاية
+    if is_at_bottom {
+        let end_iter = buffer.end_iter();
+        buffer.place_cursor(&end_iter);
+        
+        if let Some(mark) = buffer.mark("insert") {
+            text_view.scroll_to_mark(
+                &mark, 
+                0.0, 
+                true, 
+                0.0, 
+                1.0
+            );
+        }
+    }
+}
 
 pub struct Task {
     lazy_fn: RefCell<Option<Box<dyn FnOnce()>>>,
@@ -34,7 +100,7 @@ pub fn load_custom_css(css_data: &str) {
 pub fn create_plugin_button(
     parent: &adw::ApplicationWindow, 
     plugin: Arc<Mutex<dyn baseplugin::base::PluginTools + 'static>>,
-    textviewbuffer: gtk::TextBuffer,
+    textview: gtk::TextView,
     spinner: gtk::Spinner,
     toastoverlay: adw::ToastOverlay,
     non_queue_task_running_state: Arc<AtomicBool>,
@@ -147,7 +213,7 @@ pub fn create_plugin_button(
             return;
         }
         
-        let clonetextviewbuffer = textviewbuffer.clone();
+        let clonetextview = textview.clone();
         let button_clone = button.clone();
         let button_clone2 = button.clone();
         
@@ -249,8 +315,8 @@ pub fn create_plugin_button(
                         progressbar3.set_visible(false);
                         progressbar3.set_fraction(0.0);
                         match files_location {
-                            Some(f_location) =>  {  
-                                    clonetextviewbuffer.insert_at_cursor(&format!("Download Done.\n"));
+                            Some(f_location) =>  { 
+                                    append_text_with_smart_scroll(&clonetextview,&format!("Download Done.\n"));
                                     if original_need_install {
                                         c3_b_label.set_label(plugin_clone3_metadata.button_install_running_label);
                                     } else {
@@ -259,7 +325,7 @@ pub fn create_plugin_button(
                                     plugin_clone3_guard.install(clone_tx3.clone(),clone1_cancellable3.clone(),Some(f_location));
                                     },
                                 _ => {
-                                    clonetextviewbuffer.insert_at_cursor(&format!("Download Failed\n"));
+                                    append_text_with_smart_scroll(&clonetextview,&format!("Download Failed\n"));
                                     c5_non_queue_task_running_state.store(false,Ordering::SeqCst);
                                     *active_cancellable_clear.borrow_mut() = None;
                                     spinner_clone5.stop();
@@ -276,7 +342,7 @@ pub fn create_plugin_button(
                     baseplugin::base::OutMesseageType::DownloadCancelled => {
                         progressbar3.set_fraction(0.0);
                         progressbar3.set_visible(false);
-                        clonetextviewbuffer.insert_at_cursor(&format!("Download Cancelled\n"));
+                        append_text_with_smart_scroll(&clonetextview,&format!("Download Cancelled\n"));
                         c5_non_queue_task_running_state.store(false,Ordering::SeqCst);
                         *active_cancellable_clear.borrow_mut() = None;
                         spinner_clone5.stop();
@@ -291,7 +357,7 @@ pub fn create_plugin_button(
                     baseplugin::base::OutMesseageType::DownloadError => {
                         progressbar3.set_fraction(0.0);
                         progressbar3.set_visible(false);
-                        clonetextviewbuffer.insert_at_cursor(&format!("Download Failed\n"));
+                        append_text_with_smart_scroll(&clonetextview,&format!("Download Failed\n"));
                         c5_non_queue_task_running_state.store(false,Ordering::SeqCst);
                         *active_cancellable_clear.borrow_mut() = None;
                         spinner_clone5.stop();
@@ -304,10 +370,10 @@ pub fn create_plugin_button(
                         plugin_clone3_guard.set_install_is_running(false);
                     },
                     baseplugin::base::OutMesseageType::Message(msg) => {
-                        clonetextviewbuffer.insert_at_cursor(&format!("{}\n", msg));
+                        append_text_with_smart_scroll(&clonetextview,&format!("{}\n", msg));
                     },
                     baseplugin::base::OutMesseageType::Cancelled => {
-                        clonetextviewbuffer.insert_at_cursor(&format!("Cancelled\n",));
+                        append_text_with_smart_scroll(&clonetextview,&format!("Cancelled\n",));
                         c5_non_queue_task_running_state.store(false,Ordering::SeqCst);
                         *active_cancellable_clear.borrow_mut() = None;
                         spinner_clone5.stop();
@@ -326,7 +392,7 @@ pub fn create_plugin_button(
                         spinner_clone5.stop();
                         button_clone.set_sensitive(true);
                         if state == true {
-                            clonetextviewbuffer.insert_at_cursor(&format!("Done.\n"));
+                            append_text_with_smart_scroll(&clonetextview,&format!("Done.\n"));
                             new_need_install = !new_need_install;
                             if new_need_install {
                                 c3_b_label.set_label(plugin_clone3_metadata.button_install_label);
@@ -336,8 +402,7 @@ pub fn create_plugin_button(
                                     let toast = adw::Toast::new(remove_success_msg);
                                     toast.set_use_markup(true);
                                     clone2_toastoverlay.add_toast(toast);
-                                    let mut iter = clonetextviewbuffer.end_iter();
-                                    clonetextviewbuffer.insert_markup(&mut iter,&format!("{}\n",remove_success_msg));
+                                    append_markup_with_smart_scroll(&clonetextview,&format!("{}\n",remove_success_msg));
                                 }
                             } else {
                                 c3_b_label.set_label(plugin_clone3_metadata.button_remove_label);
@@ -349,8 +414,7 @@ pub fn create_plugin_button(
                                     let toast = adw::Toast::new(install_success_msg);
                                     toast.set_use_markup(true);
                                     clone2_toastoverlay.add_toast(toast);
-                                    let mut iter = clonetextviewbuffer.end_iter();
-                                    clonetextviewbuffer.insert_markup(&mut iter,&format!("{}\n",install_success_msg));
+                                    append_markup_with_smart_scroll(&clonetextview,&format!("{}\n",install_success_msg));
                                 }
                             }
 
@@ -364,7 +428,7 @@ pub fn create_plugin_button(
                                     button_clone.set_css_classes(&["btn-state-remove"]);
                                 }
                             }
-                            clonetextviewbuffer.insert_at_cursor(&format!("Failed or Cancelled.\n"));
+                            append_text_with_smart_scroll(&clonetextview,&format!("Failed or Cancelled.\n"));
                         }
                     plugin_clone3_guard.set_need_install(new_need_install);
                     plugin_clone3_guard.set_install_is_running(false);
@@ -379,7 +443,7 @@ pub fn create_plugin_button(
                         } else {
                             c3_b_label.set_label(plugin_clone3_metadata.button_remove_label);
                         }
-                        clonetextviewbuffer.insert_at_cursor(&format!("ERROR.\n"));
+                        append_text_with_smart_scroll(&clonetextview,&format!("ERROR.\n"));
                         plugin_clone3_guard.set_install_is_running(false);
                     },
                 }    
@@ -397,7 +461,7 @@ pub fn _queue_create_plugin_button(
     // تم التغيير لـ Rc + RefCell لمنع استخدام Mutex في خيط الواجهة وحل مشكلة الـ Deadlocks نهائياً
     lazy_fn_vec: Rc<RefCell<Vec<Box<Task>>>>,
     click_handler_count: Arc<AtomicI32>,
-    textviewbuffer: gtk::TextBuffer,
+    textview: gtk::TextView,
     spinner: gtk::Spinner,
     toastoverlay: adw::ToastOverlay,
 ) -> gtk::Button {
@@ -532,7 +596,7 @@ pub fn _queue_create_plugin_button(
         let _button_clone   = button.clone();
         let _parent_clone   = parent_clone.clone();
         let _plugin_clone   = Arc::clone(&plugin);
-        let _textviewbuffer = textviewbuffer.clone();
+        let _textview = textview.clone();
         let new_cancellable = gio::Cancellable::new();
         *active_cancellable_clone.borrow_mut() = Some(new_cancellable.clone());
 
@@ -588,7 +652,7 @@ pub fn _queue_create_plugin_button(
                 let plugin_clone2 = Arc::clone(&_plugin_clone);
                 let run_lazy_fn_vec = Rc::clone(&clone_lazy_fn_vec);
                 let run_click_handler_count = Arc::clone(&clone_click_handler_count);
-                let clonetextviewbuffer = _textviewbuffer.clone();
+                let clonetextview = _textview.clone();
                 let clone2_cancellable = clone_cancellable.clone();
                 let spinner_clone5 = spinner_clone4.clone();
                 let clone3_toastoverlay = clone2_toastoverlay.clone();
@@ -645,7 +709,8 @@ pub fn _queue_create_plugin_button(
                                         Some(f_location) =>  {  
                                             progressbar_clone6.set_visible(false);
                                             progressbar_clone6.set_fraction(0.0);
-                                            clonetextviewbuffer.insert_at_cursor(&format!("Download Done.\n"));
+                                            
+                                            append_text_with_smart_scroll(&clonetextview,&format!("Download Done.\n"));
                                             if original_need_install {
                                                 c8_b_label.set_label(plugin_clone3.lock().unwrap().metadata().button_install_running_label);
                                             } else {
@@ -655,7 +720,7 @@ pub fn _queue_create_plugin_button(
                                         },
                                         _ => {
                                             inner_click_handler_count.fetch_sub(1, Ordering::SeqCst);
-                                            clonetextviewbuffer.insert_at_cursor(&format!("Download Failed\n"));
+                                            append_text_with_smart_scroll(&clonetextview,&format!("Download Failed\n"));
                                             plugin_clone3.lock().unwrap().set_install_is_running(false);
                                             //*i_clone2_cancellable.borrow_mut() = None;
                                             spinner_clone6.stop();
@@ -694,7 +759,7 @@ pub fn _queue_create_plugin_button(
                                     plugin_clone3.lock().unwrap().set_install_is_running(false);
                                     spinner_clone6.stop();
                                     inner_click_handler_count.fetch_sub(1, Ordering::SeqCst);
-                                    clonetextviewbuffer.insert_at_cursor(&format!("Download Cancelled.\n"));
+                                    append_text_with_smart_scroll(&clonetextview,&format!("Download Cancelled.\n"));
                                     if original_need_install {
                                         c8_b_label.set_label(plugin_clone3.lock().unwrap().metadata().button_install_label);
                                         button_clone.set_css_classes(&["btn-state-install"]);
@@ -740,7 +805,7 @@ pub fn _queue_create_plugin_button(
                                             button_clone.set_css_classes(&["btn-state-remove"]);
                                         }
                                     }
-                                    clonetextviewbuffer.insert_at_cursor(&format!("Download ERROR\n"));
+                                    append_text_with_smart_scroll(&clonetextview,&format!("Download ERROR\n"));
                                     inner_click_handler_count.fetch_sub(1, Ordering::SeqCst);
                                     if inner_click_handler_count.load(Ordering::SeqCst) > 0 {
                                         let mut q = inner_lazy_fn_vec.borrow_mut();
@@ -765,13 +830,13 @@ pub fn _queue_create_plugin_button(
 
                                 },
                                 baseplugin::base::OutMesseageType::Message(msg) => {
-                                    clonetextviewbuffer.insert_at_cursor(&format!("{}\n", msg));
+                                    append_text_with_smart_scroll(&clonetextview,&format!("{}\n", msg));
                                 },
                                 baseplugin::base::OutMesseageType::Cancelled => {
                                     plugin_clone3.lock().unwrap().set_install_is_running(false);
                                     spinner_clone6.stop();
                                     inner_click_handler_count.fetch_sub(1, Ordering::SeqCst);
-                                    clonetextviewbuffer.insert_at_cursor(&format!("Cancelled.\n"));
+                                    append_text_with_smart_scroll(&clonetextview,&format!("Cancelled.\n"));
                                     if new_need_install {
                                         c8_b_label.set_label(plugin_clone3.lock().unwrap().metadata().button_install_label);
                                         button_clone.set_css_classes(&["btn-state-install"]);
@@ -807,7 +872,7 @@ pub fn _queue_create_plugin_button(
                                     spinner_clone6.stop();
                                     if state == true {
                                         new_need_install = !new_need_install;
-                                        clonetextviewbuffer.insert_at_cursor(&format!("Done.\n"));
+                                        append_text_with_smart_scroll(&clonetextview,&format!("Done.\n"));
                                         plugin_clone3.lock().unwrap().set_need_install(new_need_install);
                                         plugin_clone3.lock().unwrap().set_install_is_running(false);
                                         if new_need_install {
@@ -818,8 +883,7 @@ pub fn _queue_create_plugin_button(
                                                 let toast = adw::Toast::new(remove_success_msg);
                                                 toast.set_use_markup(true);
                                                 clone4_toastoverlay.add_toast(toast);
-                                                let mut iter = clonetextviewbuffer.end_iter();
-                                                clonetextviewbuffer.insert_markup(&mut iter,&format!("{}\n",remove_success_msg));
+                                                append_markup_with_smart_scroll(&clonetextview,&format!("{}\n",remove_success_msg));
                                             }
                                         } else {
                                             c8_b_label.set_label(plugin_clone3.lock().unwrap().metadata().button_remove_label);
@@ -831,8 +895,7 @@ pub fn _queue_create_plugin_button(
                                                 let toast = adw::Toast::new(install_success_msg);
                                                 toast.set_use_markup(true);
                                                 clone4_toastoverlay.add_toast(toast);
-                                                let mut iter = clonetextviewbuffer.end_iter();
-                                                clonetextviewbuffer.insert_markup(&mut iter,&format!("{}\n",install_success_msg));
+                                                append_markup_with_smart_scroll(&clonetextview,&format!("{}\n",install_success_msg));
                                             }
                                         }
                                     } else {
@@ -846,7 +909,7 @@ pub fn _queue_create_plugin_button(
                                             }
                                         }
                                         plugin_clone3.lock().unwrap().set_install_is_running(false);
-                                        clonetextviewbuffer.insert_at_cursor(&format!("Failed\n"));
+                                        append_text_with_smart_scroll(&clonetextview,&format!("Failed\n"));
                                     }
 
                                     // خروج العملية الحالية بنجاح أو فشل وسحب التالية FIFO
@@ -885,7 +948,7 @@ pub fn _queue_create_plugin_button(
                                             button_clone.set_css_classes(&["btn-state-remove"]);
                                         }
                                     }
-                                    clonetextviewbuffer.insert_at_cursor(&format!("ERROR\n"));
+                                    append_text_with_smart_scroll(&clonetextview,&format!("ERROR\n"));
 
                                     inner_click_handler_count.fetch_sub(1, Ordering::SeqCst);
                                     if inner_click_handler_count.load(Ordering::SeqCst) > 0 {
@@ -949,7 +1012,7 @@ pub fn queue_create_plugin_button(
     plugin: Arc<Mutex<dyn baseplugin::base::PluginTools + 'static>>,
     lazy_fn_vec: Rc<RefCell<Vec<Box<Task>>>>,
     click_handler_count: Arc<AtomicI32>,
-    textviewbuffer: gtk::TextBuffer,
+    textview: gtk::TextView,
     spinner: gtk::Spinner,
     toastoverlay: adw::ToastOverlay,
 ) -> gtk::Button {
@@ -1049,7 +1112,7 @@ pub fn queue_create_plugin_button(
         let _button_clone   = button.clone();
         let _parent_clone   = parent_clone.clone();
         let _plugin_clone   = Arc::clone(&plugin);
-        let _textviewbuffer = textviewbuffer.clone();
+        let _textview = textview.clone();
         
         let spinner_clone4 = spinner_clone2.clone();
         let clone2_toastoverlay = clone1_toastoverlay.clone();
@@ -1060,7 +1123,7 @@ pub fn queue_create_plugin_button(
         let active_cancellable_async = active_cancellable_clone.clone();
 
         glib::MainContext::default().spawn_local(async move { 
-            let (is_running, is_need_install, yes_or_no, dialog_header, dialog_label, custom_warning) = {
+            let (is_running, yes_or_no, dialog_header, dialog_label, custom_warning) = {
                 let guard    = _plugin_clone.lock().unwrap();
                 let running  = guard.get_install_is_running();
                 let is_need  = guard.get_need_install();
@@ -1074,7 +1137,7 @@ pub fn queue_create_plugin_button(
 
                 let warning = metadata.custom_cancel_warning_message.as_ref().map(|w| (w[0].to_string(), w[1].to_string()));
                 
-                (running, is_need, metadata.yes_or_no, h, l, warning)
+                (running, metadata.yes_or_no, h, l, warning)
             }; 
 
             if is_running {
@@ -1133,7 +1196,7 @@ pub fn queue_create_plugin_button(
             let plugin_clone2 = Arc::clone(&_plugin_clone);
             let run_lazy_fn_vec = Rc::clone(&clone_lazy_fn_vec);
             let run_click_handler_count = Arc::clone(&clone_click_handler_count);
-            let clonetextviewbuffer = _textviewbuffer.clone();
+            let clonetextview = _textview.clone();
             
             // تمرير الـ clone_cancellable لـ lazy_fn
             let clone2_cancellable = clone_cancellable.clone(); 
@@ -1223,7 +1286,7 @@ pub fn queue_create_plugin_button(
                                     Some(f_location) =>  {  
                                         progressbar_clone6.set_visible(false);
                                         progressbar_clone6.set_fraction(0.0);
-                                        clonetextviewbuffer.insert_at_cursor("Download Done.\n");
+                                        append_text_with_smart_scroll(&clonetextview,"Download Done.\n");
                                         if original_need_install {
                                             c8_b_label.set_label(&plugin_clone3.lock().unwrap().metadata().button_install_running_label);
                                         } else {
@@ -1233,7 +1296,7 @@ pub fn queue_create_plugin_button(
                                     },
                                     _ => {
                                         inner_click_handler_count.fetch_sub(1, std::sync::atomic::Ordering::SeqCst);
-                                        clonetextviewbuffer.insert_at_cursor("Download Failed\n");
+                                        append_text_with_smart_scroll(&clonetextview,"Download Failed\n");
                                         plugin_clone3.lock().unwrap().set_install_is_running(false);
                                         spinner_clone6.stop();
                                         button_clone.set_sensitive(true);
@@ -1252,7 +1315,7 @@ pub fn queue_create_plugin_button(
                                 plugin_clone3.lock().unwrap().set_install_is_running(false);
                                 spinner_clone6.stop();
                                 inner_click_handler_count.fetch_sub(1, std::sync::atomic::Ordering::SeqCst);
-                                clonetextviewbuffer.insert_at_cursor("Download Cancelled.\n");
+                                append_text_with_smart_scroll(&clonetextview,"Download Cancelled.\n");
                                 if original_need_install {
                                     c8_b_label.set_label(&plugin_clone3.lock().unwrap().metadata().button_install_label);
                                     button_clone.set_css_classes(&["btn-state-install"]);
@@ -1279,18 +1342,18 @@ pub fn queue_create_plugin_button(
                                         button_clone.set_css_classes(&["btn-state-remove"]);
                                     }
                                 }
-                                clonetextviewbuffer.insert_at_cursor("Download ERROR\n");
+                                append_text_with_smart_scroll(&clonetextview,"Download ERROR\n");
                                 inner_click_handler_count.fetch_sub(1, std::sync::atomic::Ordering::SeqCst);
                                 pending_task_fn = pop_queue();
                             },
                             baseplugin::base::OutMesseageType::Message(msg) => {
-                                clonetextviewbuffer.insert_at_cursor(&format!("{}\n", msg));
+                                append_text_with_smart_scroll(&clonetextview,&format!("{}\n", msg));
                             },
                             baseplugin::base::OutMesseageType::Cancelled => {
                                 plugin_clone3.lock().unwrap().set_install_is_running(false);
                                 spinner_clone6.stop();
                                 inner_click_handler_count.fetch_sub(1, std::sync::atomic::Ordering::SeqCst);
-                                clonetextviewbuffer.insert_at_cursor("Cancelled.\n");
+                                append_text_with_smart_scroll(&clonetextview,"Cancelled.\n");
                                 if new_need_install {
                                     c8_b_label.set_label(&plugin_clone3.lock().unwrap().metadata().button_install_label);
                                     button_clone.set_css_classes(&["btn-state-install"]);
@@ -1307,7 +1370,7 @@ pub fn queue_create_plugin_button(
                                 spinner_clone6.stop();
                                 if state == true {
                                     new_need_install = !new_need_install;
-                                    clonetextviewbuffer.insert_at_cursor("Done.\n");
+                                    append_text_with_smart_scroll(&clonetextview,"Done.\n");
                                     plugin_clone3.lock().unwrap().set_need_install(new_need_install);
                                     plugin_clone3.lock().unwrap().set_install_is_running(false);
                                     
@@ -1321,8 +1384,7 @@ pub fn queue_create_plugin_button(
                                             let toast = adw::Toast::new(&remove_success_msg);
                                             toast.set_use_markup(true);
                                             clone4_toastoverlay.add_toast(toast);
-                                            let mut iter = clonetextviewbuffer.end_iter();
-                                            clonetextviewbuffer.insert_markup(&mut iter,&format!("{}\n",remove_success_msg));
+                                            append_markup_with_smart_scroll(&clonetextview,&format!("{}\n",remove_success_msg));
                                         }
                                     } else {
                                         c8_b_label.set_label(&plugin_clone3.lock().unwrap().metadata().button_remove_label);
@@ -1335,8 +1397,7 @@ pub fn queue_create_plugin_button(
                                             let toast = adw::Toast::new(&install_success_msg);
                                             toast.set_use_markup(true);
                                             clone4_toastoverlay.add_toast(toast);
-                                            let mut iter = clonetextviewbuffer.end_iter();
-                                            clonetextviewbuffer.insert_markup(&mut iter,&format!("{}\n",install_success_msg));
+                                            append_markup_with_smart_scroll(&clonetextview,&format!("{}\n",install_success_msg));
                                         }
                                     }
                                 } else {
@@ -1350,7 +1411,7 @@ pub fn queue_create_plugin_button(
                                         }
                                     }
                                     plugin_clone3.lock().unwrap().set_install_is_running(false);
-                                    clonetextviewbuffer.insert_at_cursor("Failed\n");
+                                    append_text_with_smart_scroll(&clonetextview,"Failed\n");
                                 }
 
                                 inner_click_handler_count.fetch_sub(1, std::sync::atomic::Ordering::SeqCst);
@@ -1369,7 +1430,7 @@ pub fn queue_create_plugin_button(
                                         button_clone.set_css_classes(&["btn-state-remove"]);
                                     }
                                 }
-                                clonetextviewbuffer.insert_at_cursor("ERROR\n");
+                                append_text_with_smart_scroll(&clonetextview,"ERROR\n");
 
                                 inner_click_handler_count.fetch_sub(1, std::sync::atomic::Ordering::SeqCst);
                                 pending_task_fn = pop_queue();

@@ -101,33 +101,37 @@ pub fn create_plugin_button(
     parent: &adw::ApplicationWindow, 
     plugin: Arc<Mutex<dyn baseplugin::base::PluginTools + 'static>>,
     textview: gtk::TextView,
-    spinner: gtk::Spinner,
     toastoverlay: adw::ToastOverlay,
     non_queue_task_running_state: Arc<AtomicBool>,
 ) -> gtk::Button {
-
+    let spinner =  gtk::Spinner::new();
+    spinner.set_visible(false);
     let progressbar = gtk::ProgressBar::new();
     progressbar.set_visible(false);
     let parent_clone = parent.clone();
     let b_label = gtk::Label::new(Some("Loading..."));
     let btn = gtk::Button::builder()
-        .margin_end(5)
-        .sensitive(false)
         .build();
     btn.set_valign(gtk::Align::Center);
     btn.set_has_frame(false);
+    let button_label_spinner_progressbar_box = gtk::Box::new(gtk::Orientation::Horizontal, 1);
+    button_label_spinner_progressbar_box.set_hexpand(false);
+    button_label_spinner_progressbar_box.set_valign(gtk::Align::Center);
     let button_label_progressbar_box = gtk::Box::new(gtk::Orientation::Vertical, 0);
     button_label_progressbar_box.set_hexpand(false);
     button_label_progressbar_box.set_valign(gtk::Align::Center);
     button_label_progressbar_box.append(&b_label);
     button_label_progressbar_box.append(&progressbar);
-    btn.set_child(Some(&button_label_progressbar_box));
+    button_label_spinner_progressbar_box.append(&button_label_progressbar_box);
+    button_label_spinner_progressbar_box.append(&spinner);
+    btn.set_child(Some(&button_label_spinner_progressbar_box));
     
     let (tx, rx) = channel::oneshot::channel();
     let plugin_clone1 = Arc::clone(&plugin);
     let weak_button = btn.downgrade();
     let spinner_clone1 = spinner.clone();
     spinner.start();
+    spinner.set_visible(true);
     btn.set_css_classes(&["btn-state-waiting"]);
     non_queue_task_running_state.store(true,Ordering::SeqCst);
     let c1_non_queue_task_running_state = Arc::clone(&non_queue_task_running_state);
@@ -135,13 +139,13 @@ pub fn create_plugin_button(
     glib::MainContext::default().spawn_local(async move {
         if let Ok(_message) = rx.await {
             spinner_clone1.stop();
+            spinner_clone1.set_visible(false);
             c1_non_queue_task_running_state.store(false,Ordering::SeqCst);
             if let Some(button) = weak_button.upgrade() {
                 let need_install: bool = plugin_clone1.lock().unwrap().get_need_install();
                 let pc = plugin_clone1.clone();
                 drop(plugin_clone1);
                 glib::idle_add_local_once(move || {
-                    button.set_sensitive(true);
                     let guard = pc.lock().unwrap();
                     let metadata = guard.metadata();
                     if need_install {
@@ -206,6 +210,7 @@ pub fn create_plugin_button(
                         // إلغاء الكائن الفعلي الصحيح الذي تستمع إليه دالة read_bytes_async
                         choice_clone_cancellable.cancel();
                         spinner_clone3.stop();
+                        spinner_clone3.set_visible(false);
                         inner_non_queue_task_running_state.store(false,Ordering::SeqCst);
                     }
                 });
@@ -215,7 +220,7 @@ pub fn create_plugin_button(
         
         let clonetextview = textview.clone();
         let button_clone = button.clone();
-        let button_clone2 = button.clone();
+        //let button_clone2 = button.clone();
         
         let plugin_clone3 = Arc::clone(&plugin);
         let plugin_clone4 = Arc::clone(&plugin);
@@ -260,7 +265,6 @@ pub fn create_plugin_button(
                 yes_or_no_dialog.set_heading_use_markup(true);
                 let response = yes_or_no_dialog.choose_future(Some(&parent_clone2)).await;
                 if response == "No" {
-                    button_clone2.set_sensitive(true);
                     return;
                 }
             }
@@ -270,6 +274,7 @@ pub fn create_plugin_button(
             c3_non_queue_task_running_state.store(true,Ordering::SeqCst);
             let need_install: bool = plugin_clone4_guard.get_need_install();
             spinner_clone4.start();
+            spinner_clone4.set_visible(true);
             if need_install {
                 c_b_label.set_label(plugin_clone4_metadata.button_install_running_label);
             } else {
@@ -329,7 +334,7 @@ pub fn create_plugin_button(
                                     c5_non_queue_task_running_state.store(false,Ordering::SeqCst);
                                     *active_cancellable_clear.borrow_mut() = None;
                                     spinner_clone5.stop();
-                                    button_clone.set_sensitive(true);
+                                    spinner_clone5.set_visible(false);
                                     if new_need_install {
                                         c3_b_label.set_label(plugin_clone3_metadata.button_install_label);
                                     } else {
@@ -346,7 +351,7 @@ pub fn create_plugin_button(
                         c5_non_queue_task_running_state.store(false,Ordering::SeqCst);
                         *active_cancellable_clear.borrow_mut() = None;
                         spinner_clone5.stop();
-                        button_clone.set_sensitive(true);
+                        spinner_clone5.set_visible(false);
                         if new_need_install {
                             c3_b_label.set_label(plugin_clone3_metadata.button_install_label);
                         } else {
@@ -361,7 +366,7 @@ pub fn create_plugin_button(
                         c5_non_queue_task_running_state.store(false,Ordering::SeqCst);
                         *active_cancellable_clear.borrow_mut() = None;
                         spinner_clone5.stop();
-                        button_clone.set_sensitive(true);
+                        spinner_clone5.set_visible(false);
                         if new_need_install {
                             c3_b_label.set_label(plugin_clone3_metadata.button_install_label);
                         } else {
@@ -377,7 +382,7 @@ pub fn create_plugin_button(
                         c5_non_queue_task_running_state.store(false,Ordering::SeqCst);
                         *active_cancellable_clear.borrow_mut() = None;
                         spinner_clone5.stop();
-                        button_clone.set_sensitive(true);
+                        spinner_clone5.set_visible(false);
                         if new_need_install {
                             c3_b_label.set_label(plugin_clone3_metadata.button_install_label);
                         } else {
@@ -390,7 +395,7 @@ pub fn create_plugin_button(
                         c5_non_queue_task_running_state.store(false,Ordering::SeqCst);
                         *active_cancellable_clear.borrow_mut() = None;
                         spinner_clone5.stop();
-                        button_clone.set_sensitive(true);
+                        spinner_clone5.set_visible(false);
                         if state == true {
                             append_text_with_smart_scroll(&clonetextview,&format!("Done.\n"));
                             new_need_install = !new_need_install;
@@ -437,7 +442,7 @@ pub fn create_plugin_button(
                         c5_non_queue_task_running_state.store(false,Ordering::SeqCst);
                         *active_cancellable_clear.borrow_mut() = None;
                         spinner_clone5.stop();
-                        button_clone.set_sensitive(true);
+                        spinner_clone5.set_visible(false);
                         if new_need_install {
                             c3_b_label.set_label(plugin_clone3_metadata.button_install_label);
                         } else {
@@ -462,44 +467,46 @@ pub fn _queue_create_plugin_button(
     lazy_fn_vec: Rc<RefCell<Vec<Box<Task>>>>,
     click_handler_count: Arc<AtomicI32>,
     textview: gtk::TextView,
-    spinner: gtk::Spinner,
     toastoverlay: adw::ToastOverlay,
 ) -> gtk::Button {
 
     let parent_clone   = parent.clone();
     let btn = gtk::Button::builder()
-        .label("Loading...")
-        .margin_end(5)
-        .sensitive(false)
         .build();
-
+    let spinner = gtk::Spinner::new();
     let progressbar =  gtk::ProgressBar::new();
     progressbar.set_visible(false);
+    let button_label_spinner_progressbar_box = gtk::Box::new(gtk::Orientation::Horizontal, 1);
+    button_label_spinner_progressbar_box.set_hexpand(false);
+    button_label_spinner_progressbar_box.set_valign(gtk::Align::Center);
     let button_progressbar_box = gtk::Box::new(gtk::Orientation::Vertical, 0);
     button_progressbar_box.set_hexpand(false);
     button_progressbar_box.set_valign(gtk::Align::Center);
     let b_label = gtk::Label::new(Some("Loading..."));
     button_progressbar_box.append(&b_label);
     button_progressbar_box.append(&progressbar);
-    btn.set_child(Some(&button_progressbar_box));
+    button_label_spinner_progressbar_box.append(&button_progressbar_box);
+    button_label_spinner_progressbar_box.append(&spinner);
+    btn.set_child(Some(&button_label_spinner_progressbar_box));
 
     let (tx, rx) = channel::oneshot::channel();
     let plugin_clone1 = Arc::clone(&plugin);
     let weak_button = btn.downgrade();
     let spinner_clone1 = spinner.clone();
     spinner.start();
+    spinner.set_visible(true);
     btn.set_css_classes(&["btn-state-waiting"]);
     let c_b_label = b_label.clone();
     glib::MainContext::default().spawn_local(async move  {
         let c2_b_label = c_b_label.clone();
         if let Ok(_message) = rx.await {
             spinner_clone1.stop();
+            spinner_clone1.set_visible(false);
             if let Some(button) = weak_button.upgrade(){
                 let need_install: bool = plugin_clone1.lock().unwrap().get_need_install();
                 let pc = plugin_clone1.clone();
                 drop(plugin_clone1);
                 glib::idle_add_local_once(move || {
-                    button.set_sensitive(true);
                     if need_install {
                         c2_b_label.set_label(pc.lock().unwrap().metadata().button_install_label);
                         button.set_css_classes(&["btn-state-install"]);
@@ -588,6 +595,7 @@ pub fn _queue_create_plugin_button(
                         if response == "Yes" {
                             choice_clone_cancellable.cancel();
                             spinner_clone3.stop();
+                            spinner_clone3.set_visible(false);
                         }
                 });
             }
@@ -636,7 +644,6 @@ pub fn _queue_create_plugin_button(
                     let response = yes_or_no_dialog.choose_future(Some(&_parent_clone)).await;
 
                     if response == "No" {
-                        _button_clone.set_sensitive(true);
                         return;
                     }
                 }
@@ -659,8 +666,8 @@ pub fn _queue_create_plugin_button(
                 let progressbar_clone4 = progressbar_clone3.clone();
                 let c6_b_label    = c5_b_label.clone();
                 let lazy_fn = move || {
-                    //button_clone.set_sensitive(false);
                     spinner_clone5.start();
+                    spinner_clone5.set_visible(true);
                     let need_install: bool = plugin_clone3.lock().unwrap().get_need_install();
                     if need_install {
                         c6_b_label.set_label(plugin_clone3.lock().unwrap().metadata().button_install_running_label);
@@ -724,7 +731,7 @@ pub fn _queue_create_plugin_button(
                                             plugin_clone3.lock().unwrap().set_install_is_running(false);
                                             //*i_clone2_cancellable.borrow_mut() = None;
                                             spinner_clone6.stop();
-                                            button_clone.set_sensitive(true);
+                                            spinner_clone6.set_visible(false);
                                             if original_need_install {
                                                 c8_b_label.set_label(plugin_clone3.lock().unwrap().metadata().button_install_label);
                                             } else {
@@ -744,7 +751,6 @@ pub fn _queue_create_plugin_button(
                                                                 task.button.set_css_classes(&["btn-state-remove"]);
                                                             }
                                                         }
-                                                        //task.button.set_sensitive(false);
                                                         task.plugin.lock().unwrap().set_install_is_running(true);
                                                         f();
                                                     }
@@ -758,6 +764,7 @@ pub fn _queue_create_plugin_button(
                                     progressbar_clone6.set_visible(false);
                                     plugin_clone3.lock().unwrap().set_install_is_running(false);
                                     spinner_clone6.stop();
+                                    spinner_clone6.set_visible(false);
                                     inner_click_handler_count.fetch_sub(1, Ordering::SeqCst);
                                     append_text_with_smart_scroll(&clonetextview,&format!("Download Cancelled.\n"));
                                     if original_need_install {
@@ -783,7 +790,6 @@ pub fn _queue_create_plugin_button(
                                                         task.button.set_css_classes(&["btn-state-remove"]);
                                                     }
                                                 }
-                                                //task.button.set_sensitive(false);
                                                 task.plugin.lock().unwrap().set_install_is_running(true);
                                                 f();
                                             }
@@ -793,8 +799,8 @@ pub fn _queue_create_plugin_button(
                                 baseplugin::base::OutMesseageType::DownloadError => {
                                     progressbar_clone6.set_fraction(0.0);
                                     progressbar_clone6.set_visible(false);
-                                    button_clone.set_sensitive(true);
                                     spinner_clone6.stop();
+                                    spinner_clone6.set_visible(false);
                                     plugin_clone3.lock().unwrap().set_install_is_running(false);
                                     if original_need_install {
                                         c8_b_label.set_label(plugin_clone3.lock().unwrap().metadata().button_install_label);
@@ -821,7 +827,6 @@ pub fn _queue_create_plugin_button(
                                                         task.button.set_css_classes(&["btn-state-remove"]);
                                                     }
                                                 }
-                                                //task.button.set_sensitive(false);
                                                 task.plugin.lock().unwrap().set_install_is_running(true);
                                                 f();
                                             }
@@ -835,6 +840,7 @@ pub fn _queue_create_plugin_button(
                                 baseplugin::base::OutMesseageType::Cancelled => {
                                     plugin_clone3.lock().unwrap().set_install_is_running(false);
                                     spinner_clone6.stop();
+                                    spinner_clone6.set_visible(false);
                                     inner_click_handler_count.fetch_sub(1, Ordering::SeqCst);
                                     append_text_with_smart_scroll(&clonetextview,&format!("Cancelled.\n"));
                                     if new_need_install {
@@ -860,7 +866,6 @@ pub fn _queue_create_plugin_button(
                                                         task.button.set_css_classes(&["btn-state-remove"]);
                                                     }
                                                 }
-                                                //task.button.set_sensitive(false);
                                                 task.plugin.lock().unwrap().set_install_is_running(true);
                                                 f();
                                             }
@@ -868,8 +873,8 @@ pub fn _queue_create_plugin_button(
                                     }
                                 },
                                 baseplugin::base::OutMesseageType::State(state) => {
-                                    button_clone.set_sensitive(true);
                                     spinner_clone6.stop();
+                                    spinner_clone6.set_visible(false);
                                     if state == true {
                                         new_need_install = !new_need_install;
                                         append_text_with_smart_scroll(&clonetextview,&format!("Done.\n"));
@@ -928,7 +933,6 @@ pub fn _queue_create_plugin_button(
                                                         task.button.set_css_classes(&["btn-state-remove"]);
                                                     }
                                                 }
-                                                //task.button.set_sensitive(false);
                                                 task.plugin.lock().unwrap().set_install_is_running(true);
                                                 f();
                                             }
@@ -936,8 +940,8 @@ pub fn _queue_create_plugin_button(
                                     }
                                 },
                                 _ => {
-                                    button_clone.set_sensitive(true);
                                     spinner_clone6.stop();
+                                    spinner_clone6.set_visible(false);
                                     plugin_clone3.lock().unwrap().set_install_is_running(false);
                                     if new_need_install {
                                         c8_b_label.set_label(plugin_clone3.lock().unwrap().metadata().button_install_label);
@@ -965,7 +969,6 @@ pub fn _queue_create_plugin_button(
                                                         task.button.set_css_classes(&["btn-state-remove"]);
                                                     }
                                                 }
-                                                //task.button.set_sensitive(false);
                                                 task.plugin.lock().unwrap().set_install_is_running(true);
                                                 f();
                                             }
@@ -997,6 +1000,7 @@ pub fn _queue_create_plugin_button(
                     // زيادة العداد وتشغيل الدالة فوراً دون الانتظار أو تجميد النص
                     clone_click_handler_count.fetch_add(1, Ordering::SeqCst);
                     spinner_clone4.start();
+                    spinner_clone4.set_visible(true);
                     _plugin_clone.lock().unwrap().set_install_is_running(true);
                     lazy_fn();
                 }
@@ -1013,32 +1017,35 @@ pub fn queue_create_plugin_button(
     lazy_fn_vec: Rc<RefCell<Vec<Box<Task>>>>,
     click_handler_count: Arc<AtomicI32>,
     textview: gtk::TextView,
-    spinner: gtk::Spinner,
     toastoverlay: adw::ToastOverlay,
 ) -> gtk::Button {
 
     let parent_clone   = parent.clone();
     let btn = gtk::Button::builder()
-        .label("Loading...")
-        .margin_end(5)
-        .sensitive(false)
         .build();
-
+    let spinner = gtk::Spinner::new();
+    spinner.set_visible(false);
     let progressbar =  gtk::ProgressBar::new();
     progressbar.set_visible(false);
+    let button_label_spinner_progressbar_box = gtk::Box::new(gtk::Orientation::Horizontal, 1);
+    button_label_spinner_progressbar_box.set_hexpand(false);
+    button_label_spinner_progressbar_box.set_valign(gtk::Align::Center);
     let button_progressbar_box = gtk::Box::new(gtk::Orientation::Vertical, 0);
     button_progressbar_box.set_hexpand(false);
     button_progressbar_box.set_valign(gtk::Align::Center);
     let b_label = gtk::Label::new(Some("Loading..."));
     button_progressbar_box.append(&b_label);
     button_progressbar_box.append(&progressbar);
-    btn.set_child(Some(&button_progressbar_box));
+    button_label_spinner_progressbar_box.append(&button_progressbar_box);
+    button_label_spinner_progressbar_box.append(&spinner);
+    btn.set_child(Some(&button_label_spinner_progressbar_box));
 
     let (tx, rx) = futures::channel::oneshot::channel(); // استخدام futures channel
     let plugin_clone1 = Arc::clone(&plugin);
     let weak_button = btn.downgrade();
     let spinner_clone1 = spinner.clone();
     spinner.start();
+    spinner.set_visible(true);
     btn.set_css_classes(&["btn-state-waiting"]);
     let c_b_label = b_label.clone();
     
@@ -1046,12 +1053,12 @@ pub fn queue_create_plugin_button(
         let c2_b_label = c_b_label.clone();
         if let Ok(_message) = rx.await {
             spinner_clone1.stop();
+            spinner_clone1.set_visible(false);
             if let Some(button) = weak_button.upgrade(){
                 let need_install: bool = plugin_clone1.lock().unwrap().get_need_install();
                 let pc = plugin_clone1.clone();
                 drop(plugin_clone1);
                 glib::idle_add_local_once(move || {
-                    button.set_sensitive(true);
                     if need_install {
                         c2_b_label.set_label(&pc.lock().unwrap().metadata().button_install_label);
                         button.set_css_classes(&["btn-state-install"]);
@@ -1161,6 +1168,7 @@ pub fn queue_create_plugin_button(
                     if response == "Yes" {
                         current_cancellable.cancel(); // الآن سيقوم بإلغاء العملية الأصلية
                         spinner_clone4.stop();
+                        spinner_clone4.set_visible(false);
                     }
                 }
                 return; // الخروج مباشرة دون إنشاء Cancellable جديد
@@ -1178,7 +1186,6 @@ pub fn queue_create_plugin_button(
                 let response = yes_or_no_dialog.choose_future(Some(&_parent_clone)).await;
 
                 if response == "No" {
-                    _button_clone.set_sensitive(true);
                     return;
                 }
             }
@@ -1208,6 +1215,7 @@ pub fn queue_create_plugin_button(
             
             let lazy_fn = move || {
                 spinner_clone5.start();
+                spinner_clone5.set_visible(true);
                 let need_install: bool = plugin_clone3.lock().unwrap().get_need_install();
                 if need_install {
                     c6_b_label.set_label(&plugin_clone3.lock().unwrap().metadata().button_install_running_label);
@@ -1299,7 +1307,7 @@ pub fn queue_create_plugin_button(
                                         append_text_with_smart_scroll(&clonetextview,"Download Failed\n");
                                         plugin_clone3.lock().unwrap().set_install_is_running(false);
                                         spinner_clone6.stop();
-                                        button_clone.set_sensitive(true);
+                                        spinner_clone6.set_visible(false);
                                         if original_need_install {
                                             c8_b_label.set_label(&plugin_clone3.lock().unwrap().metadata().button_install_label);
                                         } else {
@@ -1314,6 +1322,7 @@ pub fn queue_create_plugin_button(
                                 progressbar_clone6.set_visible(false);
                                 plugin_clone3.lock().unwrap().set_install_is_running(false);
                                 spinner_clone6.stop();
+                                spinner_clone6.set_visible(false);
                                 inner_click_handler_count.fetch_sub(1, std::sync::atomic::Ordering::SeqCst);
                                 append_text_with_smart_scroll(&clonetextview,"Download Cancelled.\n");
                                 if original_need_install {
@@ -1330,8 +1339,8 @@ pub fn queue_create_plugin_button(
                             baseplugin::base::OutMesseageType::DownloadError => {
                                 progressbar_clone6.set_fraction(0.0);
                                 progressbar_clone6.set_visible(false);
-                                button_clone.set_sensitive(true);
                                 spinner_clone6.stop();
+                                spinner_clone6.set_visible(false);
                                 plugin_clone3.lock().unwrap().set_install_is_running(false);
                                 if original_need_install {
                                     c8_b_label.set_label(&plugin_clone3.lock().unwrap().metadata().button_install_label);
@@ -1352,6 +1361,7 @@ pub fn queue_create_plugin_button(
                             baseplugin::base::OutMesseageType::Cancelled => {
                                 plugin_clone3.lock().unwrap().set_install_is_running(false);
                                 spinner_clone6.stop();
+                                spinner_clone6.set_visible(false);
                                 inner_click_handler_count.fetch_sub(1, std::sync::atomic::Ordering::SeqCst);
                                 append_text_with_smart_scroll(&clonetextview,"Cancelled.\n");
                                 if new_need_install {
@@ -1366,8 +1376,8 @@ pub fn queue_create_plugin_button(
                                 pending_task_fn = pop_queue();
                             },
                             baseplugin::base::OutMesseageType::State(state) => {
-                                button_clone.set_sensitive(true);
                                 spinner_clone6.stop();
+                                spinner_clone6.set_visible(false);
                                 if state == true {
                                     new_need_install = !new_need_install;
                                     append_text_with_smart_scroll(&clonetextview,"Done.\n");
@@ -1418,8 +1428,8 @@ pub fn queue_create_plugin_button(
                                 pending_task_fn = pop_queue();
                             },
                             _ => {
-                                button_clone.set_sensitive(true);
                                 spinner_clone6.stop();
+                                spinner_clone6.set_visible(false);
                                 plugin_clone3.lock().unwrap().set_install_is_running(false);
                                 if new_need_install {
                                     c8_b_label.set_label(&plugin_clone3.lock().unwrap().metadata().button_install_label);
@@ -1461,6 +1471,7 @@ pub fn queue_create_plugin_button(
             } else {
                 clone_click_handler_count.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
                 spinner_clone4.start();
+                spinner_clone4.set_visible(true);
                 _plugin_clone.lock().unwrap().set_install_is_running(true);
                 lazy_fn();
             }

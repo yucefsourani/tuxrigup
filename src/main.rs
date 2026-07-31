@@ -485,23 +485,17 @@ fn main() {
                     action_row.set_subtitle_lines(4);
                     action_row.set_title(metadata.title);
                     action_row.set_subtitle(metadata.subtitle);
-                    let spinner = gtk::Spinner::new();
                     let b = utils::gui::queue_create_plugin_button(
                         &mainwindow,
                         plugin_arc,
                         Rc::clone(&lazy_fn_vec),
                         clone_click_handler_count,
                         text_view.clone(),
-                        spinner.clone(),
                         toastoverlay.clone()
                     );
                     b.set_has_frame(false);
                     b.set_valign(gtk::Align::Center);
-                    let spinner_button_box = gtk::Box::new(gtk::Orientation::Horizontal,2);
-                    spinner_button_box.set_valign(gtk::Align::Center);
-                    spinner_button_box.append(&spinner);
-                    spinner_button_box.append(&b);
-                    action_row.add_suffix(&spinner_button_box);
+                    action_row.add_suffix(&b);
                     let category = baseplugin::base::Category::get_catagory_label(metadata.category);
                     if let Some(listbox) = category_map.get(category) {
                         listbox.append(&action_row);
@@ -562,14 +556,9 @@ fn main() {
                     action_row.set_subtitle_lines(4);
                     action_row.set_title(metadata.title);
                     action_row.set_subtitle(metadata.subtitle);
-                    let spinner = gtk::Spinner::new();
-                    let b = utils::gui::create_plugin_button(&mainwindow,plugin_arc,text_view.clone(),spinner.clone(),toastoverlay.clone(),Arc::clone(&non_queue_task_running_state));
-                    let spinner_button_box = gtk::Box::new(gtk::Orientation::Horizontal,2);
-                    spinner_button_box.set_valign(gtk::Align::Center);
-                    spinner_button_box.append(&spinner);
-                    spinner_button_box.append(&b);
+                    let b = utils::gui::create_plugin_button(&mainwindow,plugin_arc,text_view.clone(),toastoverlay.clone(),Arc::clone(&non_queue_task_running_state));
                     
-                    action_row.add_suffix(&spinner_button_box);
+                    action_row.add_suffix(&b);
                     let row_box =  gtk::Box::new(gtk::Orientation::Horizontal, 0);
                     row_box.set_halign(gtk::Align::End);
                     row_box.set_margin_start(5);

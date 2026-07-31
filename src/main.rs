@@ -402,29 +402,25 @@ fn main() {
                                     type_b.set_css_classes(&["running-destructive-action-button","flat"]);
                                     row_box.append(&type_b);
                                     action_row.add_row(&row_box);
-                                    if let Some(icon_path) = utils::fs::get_icon_path(l_file.icon_name) {
-                                        let icon = widgets::ImagePaint::new(icon_path, 50.0, 50.0,None);
-                                        icon.set_valign(gtk::Align::Center);
-                                        action_row.add_prefix(&icon);
-                                    }else {
-                                        if let Some(icon_) = app_i.icon(){
-                                            if let Some(icon_name) = icon_.to_string(){
-                                                let icon = widgets::ImagePaint::new("", 50.0, 50.0,Some(format!("{}",icon_name)));
-                                                icon.set_valign(gtk::Align::Center);
-                                                action_row.add_prefix(&icon);
-                                            }else{
-                                                let icon = widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()));
-                                                icon.set_valign(gtk::Align::Center);
-                                                action_row.add_prefix(&icon);
-                                            }
-
+                                    
+                                    let icon: widgets::ImagePaint  = {
+                                        if let Some(icon_path) = utils::fs::get_icon_path(l_file.icon_name)  {
+                                            widgets::ImagePaint::new(icon_path, 50.0, 50.0,None)
                                         }else{
-                                            let icon = widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()));
-                                            icon.set_valign(gtk::Align::Center);
-                                            action_row.add_prefix(&icon);
+                                            if let Some(icon_) = app_i.icon(){
+                                                if let Some(icon_name) = icon_.to_string(){
+                                                    widgets::ImagePaint::new("", 50.0, 50.0,Some(format!("{}",icon_name)))
+                                                }else {
+                                                    widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
+                                                }
+                                            }else{
+                                                widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
+                                            }
                                         }
+                                    };
 
-                                    }
+                                    icon.set_valign(gtk::Align::Center);
+                                    action_row.add_prefix(&icon);
                                     let category = baseplugin::base::Category::get_catagory_label(l_file.category);
                                     if let Some(listbox) = category_map.get(category) {
                                         listbox.append(&action_row);
@@ -437,52 +433,55 @@ fn main() {
             }
             
             for plugin in all_plugin.into_iter() {
-                if plugin.metadata().if_true_skip == true {continue};
-                let is_supported = plugin.metadata().arch.contains(&"all") 
-                                        || plugin.metadata().arch.contains(&CURRENT_ARCH);
+                let plugin_arc: Arc<Mutex<dyn baseplugin::base::PluginTools>> = Arc::new(Mutex::new(plugin));
+                let clone_plugin_arc = Arc::clone(&plugin_arc);
+                let clone_plugin_arc_guard = clone_plugin_arc.lock().unwrap();
+                let metadata = clone_plugin_arc_guard.metadata();
+                    
+                if metadata.if_true_skip == true {continue};
+                let is_supported = metadata.arch.contains(&"all") 
+                                        || metadata.arch.contains(&CURRENT_ARCH);
                 if is_supported != true {continue};
 
-                let is_supported = plugin.metadata().distro_name.contains(&"all") 
-                                        || plugin.metadata().distro_name.contains(&DISTRO_NAME.get().unwrap().as_str());
+                let is_supported = metadata.distro_name.contains(&"all") 
+                                        || metadata.distro_name.contains(&DISTRO_NAME.get().unwrap().as_str());
                 if is_supported != true {continue};
                 
-                let is_supported = plugin.metadata().distro_version.contains(&"all") 
-                                        || plugin.metadata().distro_version.contains(&DISTRO_VERSION.get().unwrap().as_str());
+                let is_supported = metadata.distro_version.contains(&"all") 
+                                        || metadata.distro_version.contains(&DISTRO_VERSION.get().unwrap().as_str());
                 if is_supported != true {continue};
                 
             
-                let is_supported: bool = if plugin.metadata().desktop_env.contains(&"all") {
+                let is_supported: bool = if metadata.desktop_env.contains(&"all") {
                                             true
                                         } else {
                                             let current_desktop = DESKTOP_TYPE.get().unwrap().as_str();
 
-                                            plugin.metadata().desktop_env.iter().any(|&type_| {
+                                            metadata.desktop_env.iter().any(|&type_| {
                                                 type_.contains(current_desktop)
                                             })
                                         };
                 if is_supported != true {continue};
 
-                let is_supported: bool =  if plugin.metadata().display_type.contains(&"all") {
+                let is_supported: bool =  if metadata.display_type.contains(&"all") {
                                             true
                                         } else {
                                             let current_desktop = DISPLAY_TYPE.get().unwrap().as_str();
 
-                                            plugin.metadata().display_type.iter().any(|&type_| {
+                                            metadata.display_type.iter().any(|&type_| {
                                                 type_.contains(current_desktop)
                                             })
                                         };
                 if is_supported != true {continue};
 
-            if plugin.metadata().type_ != baseplugin::base::PluginType::Website  {
-                if plugin.metadata().install_in_queue {
-                    let plugin_arc: Arc<Mutex<dyn baseplugin::base::PluginTools>> = Arc::new(Mutex::new(plugin));
-                    let clone_plugin_arc = Arc::clone(&plugin_arc);
+            if metadata.type_ != baseplugin::base::PluginType::Website  {
+                if metadata.install_in_queue {
                     let clone_click_handler_count = Arc::clone(&click_handler_count);
                     let action_row = adw::ExpanderRow::new();
                     action_row.set_title_lines(1);
                     action_row.set_subtitle_lines(4);
-                    action_row.set_title(clone_plugin_arc.lock().unwrap().metadata().title);
-                    action_row.set_subtitle(clone_plugin_arc.lock().unwrap().metadata().subtitle);
+                    action_row.set_title(metadata.title);
+                    action_row.set_subtitle(metadata.subtitle);
                     let spinner = gtk::Spinner::new();
                     let b = utils::gui::queue_create_plugin_button(
                         &mainwindow,
@@ -500,21 +499,21 @@ fn main() {
                     spinner_button_box.append(&spinner);
                     spinner_button_box.append(&b);
                     action_row.add_suffix(&spinner_button_box);
-                    let category = baseplugin::base::Category::get_catagory_label(clone_plugin_arc.lock().unwrap().metadata().category);
+                    let category = baseplugin::base::Category::get_catagory_label(metadata.category);
                     if let Some(listbox) = category_map.get(category) {
                         listbox.append(&action_row);
                     }
                     
+                    let icon = {
+                        if let Some(icon_path) = utils::fs::get_icon_path(metadata.icon_name) {
+                            widgets::ImagePaint::new(icon_path, 50.0, 50.0,None)
+                        }else {
+                            widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
+                        }
+                    };
+                    icon.set_valign(gtk::Align::Center);
+                    action_row.add_prefix(&icon);
                     
-                    if let Some(icon_path) = utils::fs::get_icon_path(clone_plugin_arc.lock().unwrap().metadata().icon_name) {
-                        let icon = widgets::ImagePaint::new(icon_path, 50.0, 50.0,None);
-                        icon.set_valign(gtk::Align::Center);
-                        action_row.add_prefix(&icon);
-                    }else {
-                        let icon = widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()));
-                        icon.set_valign(gtk::Align::Center);
-                        action_row.add_prefix(&icon);
-                    }
                     let row_box =  gtk::Box::new(gtk::Orientation::Horizontal, 0);
                     row_box.set_halign(gtk::Align::End);
                     row_box.set_margin_start(5);
@@ -522,7 +521,7 @@ fn main() {
                     row_box.set_margin_top(2);
                     row_box.set_margin_bottom(2);
                     row_box.set_css_classes(&["linked","flat"]);
-                    let files_to_download_count: usize = clone_plugin_arc.lock().unwrap().get_downlods_files_length() ;
+                    let files_to_download_count: usize = clone_plugin_arc_guard.get_downlods_files_length() ;
                     if  files_to_download_count > 0 {
                         let need_download_b = gtk::Button::new();
                         need_download_b.set_label(&format!("Downloads {}",files_to_download_count));
@@ -530,11 +529,11 @@ fn main() {
                         row_box.append(&need_download_b);
                     }
                     let type_b = gtk::Button::new();
-                    type_b.set_label(baseplugin::base::PluginType::get_type_label(clone_plugin_arc.lock().unwrap().metadata().type_)); 
+                    type_b.set_label(baseplugin::base::PluginType::get_type_label(metadata.type_)); 
                     type_b.set_css_classes(&["running-destructive-action-button","flat"]);
                     row_box.append(&type_b);
                     action_row.add_row(&row_box);
-                    let website_info = clone_plugin_arc.lock().unwrap().metadata().website;
+                    let website_info = metadata.website;
                     if website_info.len() >=2 {
                         let link          = website_info[0];
                         let website_label = website_info[1];
@@ -543,7 +542,7 @@ fn main() {
                         row_box.append(&web_link_button);
                     }
                     
-                    let licenses_info = clone_plugin_arc.lock().unwrap().metadata().licenses;
+                    let licenses_info = metadata.licenses;
                     for license in licenses_info {
                         let license_web  = license[0];
                         let license_type = license[1];
@@ -555,13 +554,11 @@ fn main() {
                     
                     
                 }else {
-                    let plugin_arc: Arc<Mutex<dyn baseplugin::base::PluginTools>> = Arc::new(Mutex::new(plugin));
-                    let clone_plugin_arc = Arc::clone(&plugin_arc);
                     let action_row = adw::ExpanderRow::new();
                     action_row.set_title_lines(1);
                     action_row.set_subtitle_lines(4);
-                    action_row.set_title(clone_plugin_arc.lock().unwrap().metadata().title);
-                    action_row.set_subtitle(clone_plugin_arc.lock().unwrap().metadata().subtitle);
+                    action_row.set_title(metadata.title);
+                    action_row.set_subtitle(metadata.subtitle);
                     let spinner = gtk::Spinner::new();
                     let b = utils::gui::create_plugin_button(&mainwindow,plugin_arc,text_view_buffer.clone(),spinner.clone(),toastoverlay.clone(),Arc::clone(&non_queue_task_running_state));
                     let spinner_button_box = gtk::Box::new(gtk::Orientation::Horizontal,2);
@@ -577,7 +574,7 @@ fn main() {
                     row_box.set_margin_top(2);
                     row_box.set_margin_bottom(2);
                     row_box.set_css_classes(&["linked","flat"]);
-                    let files_to_download_count: usize = clone_plugin_arc.lock().unwrap().get_downlods_files_length() ;
+                    let files_to_download_count: usize = clone_plugin_arc_guard.get_downlods_files_length() ;
                     if  files_to_download_count > 0 {
                         let need_download_b = gtk::Button::new();
                         need_download_b.set_label(&format!("Downloads {}",files_to_download_count));
@@ -585,11 +582,11 @@ fn main() {
                         row_box.append(&need_download_b);
                     }
                     let type_b = gtk::Button::new();
-                    type_b.set_label(baseplugin::base::PluginType::get_type_label(clone_plugin_arc.lock().unwrap().metadata().type_)); 
+                    type_b.set_label(baseplugin::base::PluginType::get_type_label(metadata.type_)); 
                     type_b.set_css_classes(&["running-destructive-action-button","flat"]);
                     row_box.append(&type_b);
                     action_row.add_row(&row_box);
-                    let website_info = clone_plugin_arc.lock().unwrap().metadata().website;
+                    let website_info = metadata.website;
                     if website_info.len() >=2 {
                         let link          = website_info[0];
                         let website_label = website_info[1];
@@ -598,7 +595,7 @@ fn main() {
                         row_box.append(&web_link_button);
                     }
                     
-                    let licenses_info = clone_plugin_arc.lock().unwrap().metadata().licenses;
+                    let licenses_info = metadata.licenses;
                     for license in licenses_info {
                         let license_web  = license[0];
                         let license_type = license[1];
@@ -607,27 +604,28 @@ fn main() {
                         row_box.append(&link_button);
                     }
                     
-                    if let Some(icon_path) = utils::fs::get_icon_path(clone_plugin_arc.lock().unwrap().metadata().icon_name) {
-                        let icon = widgets::ImagePaint::new(icon_path, 50.0, 50.0,None);
-                        icon.set_valign(gtk::Align::Center);
-                        action_row.add_prefix(&icon);
-                    }else {
-                        let icon = widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()));
-                        icon.set_valign(gtk::Align::Center);
-                        action_row.add_prefix(&icon);
-                    }
-                    let category = baseplugin::base::Category::get_catagory_label(clone_plugin_arc.lock().unwrap().metadata().category);
+                    let icon = {
+                        if let Some(icon_path) = utils::fs::get_icon_path(metadata.icon_name) {
+                            widgets::ImagePaint::new(icon_path, 50.0, 50.0,None)
+                        }else {
+                            widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
+                        }
+                    };
+                    icon.set_valign(gtk::Align::Center);
+                    action_row.add_prefix(&icon);
+
+                    let category = baseplugin::base::Category::get_catagory_label(metadata.category);
                     if let Some(listbox) = category_map.get(category) {
                         listbox.append(&action_row);
                     }
                 }
-            } else  if plugin.metadata().type_ == baseplugin::base::PluginType::Website {
+            } else  if metadata.type_ == baseplugin::base::PluginType::Website {
                 let action_row = adw::ExpanderRow::new();
                 action_row.set_title_lines(1);
                 action_row.set_subtitle_lines(4);
-                action_row.set_title(plugin.metadata().title);
-                action_row.set_subtitle(plugin.metadata().subtitle);
-                let b = gtk::LinkButton::with_label(plugin.metadata().website[1],"Open");
+                action_row.set_title(metadata.title);
+                action_row.set_subtitle(metadata.subtitle);
+                let b = gtk::LinkButton::with_label(metadata.website[1],"Open");
                 b.set_valign(gtk::Align::Center);
                 b.set_css_classes(&["btn-state-install"]);
                 b.set_has_frame(false);
@@ -640,20 +638,23 @@ fn main() {
                 row_box.set_margin_bottom(2);
                 row_box.set_css_classes(&["linked","flat"]);
                 let type_b = gtk::Button::new();
-                type_b.set_label(baseplugin::base::PluginType::get_type_label(plugin.metadata().type_)); 
+                type_b.set_label(baseplugin::base::PluginType::get_type_label(metadata.type_)); 
                 type_b.set_css_classes(&["running-destructive-action-button","flat"]);
                 row_box.append(&type_b);
                 action_row.add_row(&row_box);
-                if let Some(icon_path) = utils::fs::get_icon_path(plugin.metadata().icon_name) {
-                    let icon = widgets::ImagePaint::new(icon_path, 50.0, 50.0,None);
-                    icon.set_valign(gtk::Align::Center);
-                    action_row.add_prefix(&icon);
-                }else {
-                    let icon = widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()));
-                    icon.set_valign(gtk::Align::Center);
-                    action_row.add_prefix(&icon);
-                }
-                let category = baseplugin::base::Category::get_catagory_label(plugin.metadata().category);
+                
+                let icon = {
+                    if let Some(icon_path) = utils::fs::get_icon_path(metadata.icon_name) {
+                        widgets::ImagePaint::new(icon_path, 50.0, 50.0,None)
+                    }else{
+                        widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
+                    }
+                    
+                };
+                icon.set_valign(gtk::Align::Center);
+                action_row.add_prefix(&icon);
+
+                let category = baseplugin::base::Category::get_catagory_label(metadata.category);
                 if let Some(listbox) = category_map.get(category) {
                     listbox.append(&action_row);
                 }

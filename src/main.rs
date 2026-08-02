@@ -118,21 +118,11 @@ fn init_distro_info() {
 }
 
 pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
-    // ... [لا تغيير على بنية الـ get_all_plugins] ...
     vec![
-        //Box::new(plugins::firefox::FirefoxPlugin::create()),
-        //Box::new(plugins::firefox::FirefoxPlugin::create()),
-        //Box::new(plugins::xterm::XtermPlugin::create()),
-        //Box::new(plugins::xterm::XtermPlugin::create()),
-        Box::new(plugins::firefox::get_plugin()),
         Box::new(plugins::xdm::get_plugin()),
         Box::new(plugins::albasheer::get_plugin()),
-        Box::new(plugins::xterm::get_plugin()),
-        Box::new(plugins::xterm::get_plugin()),
-        Box::new(plugins::xterm::get_plugin()),
-        Box::new(plugins::xterm::get_plugin()),
-        Box::new(plugins::codecs::get_plugin()),
-        // ... بقية الـ plugins تظل كما هي
+        Box::new(plugins::arduinoide::get_plugin()),
+        Box::new(plugins::arduinoidev2::get_plugin()),
     ]
 }
 
@@ -406,7 +396,7 @@ fn main() {
                     }
                 all_appi
             };
-            for l_file  in launche_files {
+            for l_file  in launche_files.into_iter() {
                 let is_supported = l_file.arch.contains(&"all") 
                                         || l_file.arch.contains(&CURRENT_ARCH);
                 if is_supported != true {continue};
@@ -572,7 +562,6 @@ fn main() {
                                         };
                 if is_supported != true {continue};
 
-            if metadata.type_ != baseplugin::base::PluginType::Website  {
                 if metadata.install_in_queue {
                     let clone_click_handler_count = Arc::clone(&click_handler_count);
                     let action_row = adw::ExpanderRow::new();
@@ -713,13 +702,58 @@ fn main() {
                         listbox.append(&action_row);
                     }
                 }
-            } else  if metadata.type_ == baseplugin::base::PluginType::Website {
+            } 
+            let all_website_plugins = plugins::all_website_plugins::get_all_website_plugins();
+            for website_plugin in all_website_plugins.into_iter() {
+               let is_supported = website_plugin.arch.contains(&"all") 
+                                        || website_plugin.arch.contains(&CURRENT_ARCH);
+                if is_supported != true {continue};
+
+                let is_supported = website_plugin.distro_name.contains(&"all") 
+                                        || website_plugin.distro_name.contains(&DISTRO_NAME.get().unwrap().as_str());
+                if is_supported != true {continue};
+                
+                let is_supported = website_plugin.distro_version.contains(&"all") 
+                                        || website_plugin.distro_version.contains(&DISTRO_VERSION.get().unwrap().as_str());
+                if is_supported != true {continue};
+                
+            
+                let is_supported: bool = if website_plugin.desktop_env.contains(&"all") {
+                                            true
+                                        } else {
+                                            let current_desktop = DESKTOP_TYPE.get().unwrap().as_str();
+
+                                            website_plugin.desktop_env.iter().any(|&type_| {
+                                                type_.contains(current_desktop)
+                                            })
+                                        };
+                if is_supported != true {continue};
+
+                let is_supported: bool =  if website_plugin.display_type.contains(&"all") {
+                                            true
+                                        } else {
+                                            let current_desktop = DISPLAY_TYPE.get().unwrap().as_str();
+
+                                            website_plugin.display_type.iter().any(|&type_| {
+                                                type_.contains(current_desktop)
+                                            })
+                                        };
+                if is_supported != true {continue};
+
+
                 let action_row = adw::ExpanderRow::new();
                 action_row.set_title_lines(1);
                 action_row.set_subtitle_lines(4);
-                action_row.set_title(metadata.title);
-                action_row.set_subtitle(metadata.subtitle);
-                let b = gtk::LinkButton::with_label(metadata.website[1],"Open");
+                action_row.set_title(website_plugin.title);
+                action_row.set_subtitle(website_plugin.subtitle);
+                let b = {
+                    if let Some(custom_label) = website_plugin.custom_button_label {
+                        gtk::LinkButton::with_label(website_plugin.link,custom_label)
+                    }
+                    else {
+                        gtk::LinkButton::with_label(website_plugin.link,"Open")
+                    }
+                };
                 b.set_valign(gtk::Align::Center);
                 b.set_css_classes(&["btn-state-install"]);
                 b.set_has_frame(false);
@@ -732,13 +766,13 @@ fn main() {
                 row_box.set_margin_bottom(2);
                 row_box.set_css_classes(&["linked","flat"]);
                 let type_b = gtk::Button::new();
-                type_b.set_label(baseplugin::base::PluginType::get_type_label(metadata.type_)); 
+                type_b.set_label(baseplugin::base::PluginType::get_type_label(website_plugin.type_)); 
                 type_b.set_css_classes(&["running-destructive-action-button","flat"]);
                 row_box.append(&type_b);
                 action_row.add_row(&row_box);
                 
                 let icon = {
-                    if let Some(icon_path) = utils::fs::get_icon_path(metadata.icon_name) {
+                    if let Some(icon_path) = utils::fs::get_icon_path(website_plugin.icon_name) {
                         widgets::ImagePaint::new(icon_path, 50.0, 50.0,None)
                     }else{
                         widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
@@ -748,14 +782,14 @@ fn main() {
                 icon.set_valign(gtk::Align::Center);
                 action_row.add_prefix(&icon);
 
-                let category = baseplugin::base::Category::get_catagory_label(metadata.category);
+                let category = baseplugin::base::Category::get_catagory_label(website_plugin.category);
                 if let Some(listbox) = category_map.get(category) {
                     listbox.append(&action_row);
                 }
                 
                 
             }
-        }
+        
         mainwindow.present();
     });
     app.run();

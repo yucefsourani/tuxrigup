@@ -27,6 +27,22 @@ pub struct LauncherFileInfo {
     pub custom_button_label: Option<&'static str>,
 }
 
+#[derive(Debug)]
+pub struct WebsiteInfo {
+    pub link: &'static str,
+    pub title: &'static str,
+    pub subtitle: &'static str,
+    pub type_: PluginType,
+    pub arch: &'static [&'static str],
+    pub distro_name: &'static [&'static str],
+    pub distro_version: &'static [&'static str],
+    pub category: Category,
+    pub desktop_env:  &'static [&'static str],
+    pub display_type: &'static [&'static str],
+    pub icon_name: &'static str,
+    pub custom_button_label: Option<&'static str>,
+}
+
 
 #[derive(Debug)]
 pub struct DownloadTask {
@@ -76,6 +92,8 @@ pub enum Category {
     System,
     Gnome,
     Internet,
+    Launcher,
+    Education,
     }
 
 impl Category {
@@ -89,12 +107,14 @@ impl Category {
             Self::System => "System",
             Self::Gnome => "Gnome",
             Self::Internet => "Internet",
+            Self::Launcher => "Launcher",
+            Self::Education => "Education",
             }
         }
 
         
     pub fn get_str_list_catagory() -> &'static [&'static str] {
-        &["WebSite","Developer","Multimedia","Graphics","Other","System","Gnome","Internet"]
+        &["Launcher","WebSite","Internet","Multimedia","Graphics","Education","Developer","System","Gnome","Other"]
         }
     }
 
@@ -193,7 +213,6 @@ pub struct PluginMetaData {
     pub custom_cancel_warning_message: Option<&'static [&'static str]>,
     pub after_success_install_message: Option<&'static str>,
     pub after_success_remove_message: Option<&'static str>,
-    pub keywords: &'static str,
     pub licenses: &'static [&'static [&'static str]],
     pub website:  &'static [&'static str],
 }

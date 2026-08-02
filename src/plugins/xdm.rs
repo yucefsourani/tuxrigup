@@ -56,8 +56,7 @@ pub fn get_plugin() -> CustomInstaller {
         after_success_remove_message: None,  // e.g., Some("Remove Done.") to show a Toast notification
         
         // Metadata
-        icon_name: "brave-origin.png", // Image file name in the 'images' folder
-        keywords: "downloader xdman", 
+        icon_name: "xdman.png", // Image file name in the 'images' folder
         licenses: &[&["License\nGPL V2.0", "https://www.gnu.org/licenses/gpl-2.0.html"]],
         website: &["WebSite", "https://github.com/subhra74/xdm"],
     };

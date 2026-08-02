@@ -214,15 +214,10 @@ fn main() {
                     c_overlaysplitview_collapsed_button.set_visible(false);
                     return;
                 }
-            c_overlaysplitview_collapsed_button.set_visible(true);
             }
         });
         headerbar.pack_start(&overlaysplitview_collapsed_button);
         let overlaysplitview       = adw::OverlaySplitView::new();
-        let clone_overlaysplitview = overlaysplitview.clone();
-        /*overlaysplitview_collapsed_button.connect_toggled(move|_button| {
-            clone_overlaysplitview.set_show_sidebar(!clone_overlaysplitview.shows_sidebar());
-            });*/
         breakpoint.add_setter(&overlaysplitview, "collapsed", Some(&true.to_value()));
 
         overlaysplitview.set_max_sidebar_width(100.0);
@@ -240,6 +235,7 @@ fn main() {
         side_searchbar.connect_entry(&side_searchentry);
         side_searchentry.set_placeholder_text(Some("Search..."));
         side_toolbarview.add_top_bar(&side_searchbar);
+        
         main_page_stack.set_hexpand(true);
         main_page_stack.set_vexpand(true);
         let main_page_viewswitcher = adw::ViewSwitcherSidebar::new();
@@ -266,29 +262,57 @@ fn main() {
             clamp.set_maximum_size(500);
             let clamp_sw      = gtk::ScrolledWindow::new();
             let clamp_listbox = gtk::ListBox::new();
-            let clone_side_searchentry = side_searchentry.clone();
-            clamp_listbox.set_filter_func(move |listboxrow| {
-                let text_to_search = clone_side_searchentry.text().trim().to_lowercase().to_string();
-                if text_to_search.len() < 3 {
-                    return true;
-                }
-                if let Some(expander_row) = listboxrow.downcast_ref::<adw::ExpanderRow>() {
-                    let title = expander_row.title().to_lowercase();
-                    let subtitle = expander_row.subtitle().to_lowercase();
-                    if title.contains(&text_to_search) || subtitle.contains(&text_to_search) {
-                        return true;
-                    }
-                    false
-                } else {
-                    true
-                }
-            });
-
+            let empty_status = adw::StatusPage::builder()
+                                                .icon_name("system-search-symbolic") 
+                                                .title("No Results Found")
+                                                .vexpand(true)
+                                                .description("We couldn't find what you're looking for in this section.")
+                                                .build();
+            clamp_listbox.set_placeholder(Some(&empty_status));
             clamp_listbox.set_css_classes(&["boxed-list"]);
             clamp.set_child(Some(&clamp_sw));
             clamp_sw.set_child(Some(&clamp_listbox));
             vbox.append(&clamp);
-            let _ = main_page_stack.add_titled(&vbox,Some(category),category);
+            let page  = main_page_stack.add_titled(&vbox,Some(category),category);
+            
+            
+            let page_clone  = page.clone();
+            let clamp_listbox_clone = clamp_listbox.clone();
+           side_searchentry.connect_search_changed(move |entry| {
+                let text_to_search = entry.text().trim().to_lowercase();
+                let mut has_results = false;
+
+                if text_to_search.len() < 3 {
+                    let mut child = clamp_listbox_clone.first_child();
+                    while let Some(widget) = child {
+                        if let Some(row) = widget.downcast_ref::<adw::ExpanderRow>() {
+                            row.set_visible(true);
+                        }
+                        child = widget.next_sibling();
+                    }
+                    
+                    page_clone.set_visible(true);
+                    return; 
+                }
+                let mut child = clamp_listbox_clone.first_child();
+                while let Some(widget) = child {
+                    if let Some(row) = widget.downcast_ref::<adw::ExpanderRow>() {
+                        
+                        let title = row.title().to_lowercase();
+                        let subtitle = row.subtitle().to_lowercase();
+                        
+                        let is_match = title.contains(&text_to_search) || subtitle.contains(&text_to_search);
+
+                        row.set_visible(is_match);
+                        
+                        if is_match {
+                            has_results = true;
+                        }
+                    }
+                    child = widget.next_sibling();
+                }
+                page_clone.set_visible(has_results);
+            });
             category_map.insert(category,clamp_listbox);
         }
         
@@ -710,11 +734,6 @@ fn main() {
                 
             }
         }
-        side_searchentry.connect_search_changed( move |entry| {
-            for listbox in category_map.values(){
-                    listbox.invalidate_filter();
-            }
-        });
         mainwindow.present();
     });
     app.run();

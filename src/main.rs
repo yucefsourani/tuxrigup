@@ -143,7 +143,7 @@ fn main() {
         utils::gui::load_custom_css(CSS);
 
         let all_plugin = get_all_plugins();
-        let mainwindow = adw::ApplicationWindow::builder().application(app).title("Gtk4 Example").build();
+        let mainwindow = adw::ApplicationWindow::builder().application(app).title("TuxRigUp").build();
 
         let settings  =  adw::gio::Settings::with_path("com.github.yucefsourani.tuxrigup","/com/github/yucefsourani/tuxrigupe/");
         settings.bind("width",&mainwindow,"default-width").build();
@@ -199,16 +199,30 @@ fn main() {
         
         breakpoint.add_setter(&view_switcher_bar, "reveal", Some(&true.to_value()));
         breakpoint.add_setter(&headerbar, "title-widget", Some(&gtk::Widget::NONE.to_value()));
-        mainwindow.add_breakpoint(breakpoint);
+       
  
         
         let mut category_map: HashMap<&str,gtk::ListBox> = HashMap::new();
-        let main_box_page          = gtk::Box::new(gtk::Orientation::Horizontal, 0);
+        let overlaysplitview_collapsed_button = gtk::ToggleButton::builder().icon_name("sidebar-show-symbolic").build();
+        headerbar.pack_start(&overlaysplitview_collapsed_button);
+        let overlaysplitview       = adw::OverlaySplitView::new();
+        let clone_overlaysplitview = overlaysplitview.clone();
+        /*overlaysplitview_collapsed_button.connect_toggled(move|_button| {
+            clone_overlaysplitview.set_show_sidebar(!clone_overlaysplitview.shows_sidebar());
+            });*/
+        breakpoint.add_setter(&overlaysplitview, "collapsed", Some(&true.to_value()));
+
+        overlaysplitview.set_max_sidebar_width(100.0);
+        overlaysplitview
+            .bind_property("show-sidebar", &overlaysplitview_collapsed_button, "active")
+            .bidirectional()
+            .sync_create()
+            .build();
         let main_page_stack        = adw::ViewStack::new();
         let side_toolbarview       = adw::ToolbarView::new();
         let side_searchbar         = gtk::SearchBar::new();
         let side_searchentry       = gtk::SearchEntry::new();
-        side_searchbar.set_key_capture_widget(Some(&main_box_page));
+        side_searchbar.set_key_capture_widget(Some(&overlaysplitview));
         side_searchbar.set_child(Some(&side_searchentry));
         side_searchbar.connect_entry(&side_searchentry);
         side_searchentry.set_placeholder_text(Some("Search..."));
@@ -221,11 +235,11 @@ fn main() {
         main_page_viewswitcher.set_size_request(140,-1);
         main_page_viewswitcher.set_stack(Some(&main_page_stack));
         side_toolbarview.set_content(Some(&main_page_viewswitcher));
-        main_box_page.append(&side_toolbarview);
-        main_box_page.append(&main_page_stack);
+        overlaysplitview.set_sidebar(Some(&side_toolbarview));
+        overlaysplitview.set_content(Some(&main_page_stack));
         
-
         
+        mainwindow.add_breakpoint(breakpoint);
         for category in baseplugin::base::Category::get_str_list_catagory() {
             let vbox          = gtk::Box::new(gtk::Orientation::Vertical, 0);
             vbox.set_hexpand(true);
@@ -269,7 +283,7 @@ fn main() {
         
         let output_box_page  = gtk::Box::new(gtk::Orientation::Vertical, 0);
         //let about_box_page   = gtk::Box::new(gtk::Orientation::Vertical, 0);
-        let _ = mainstack.add_titled_with_icon(&main_box_page,Some("mhbox"),"Main","application-x-executable-symbolic");
+        let _ = mainstack.add_titled_with_icon(&overlaysplitview,Some("mhbox"),"Main","application-x-executable-symbolic");
         let _ = mainstack.add_titled_with_icon(&output_box_page,Some("output"),"Output","utilities-terminal-symbolic");
         //let _ = mainstack.add_titled_with_icon(&about_box_page,Some("about"),"About","help-about-symbolic");
         settings.bind("visible-stack-child", &mainstack, "visible-child-name").build();

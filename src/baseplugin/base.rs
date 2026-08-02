@@ -3,10 +3,12 @@ use crate::utils;
 use crate::DISTRO_VERSION;
 use crate::HOMEDIR;
 use crate::CONFIGDIR;
+use crate::DOWNLOADSDIR;
 use gio;
 use gtk::glib;
 use tempfile::Builder;
 use std::sync::{Arc,Mutex};
+
 pub trait DownloadTaskTrait: Send + Sync {
     fn generate_download_location(&mut self) -> bool;
 }
@@ -22,6 +24,7 @@ pub struct LauncherFileInfo {
     pub desktop_env:  &'static [&'static str],
     pub display_type: &'static [&'static str],
     pub icon_name: &'static str,
+    pub custom_button_label: Option<&'static str>,
 }
 
 
@@ -276,6 +279,7 @@ impl PluginTools for DnfInstaller {
                 vec_command.push(format!("export TARGET_DIR{}='{}'", index +1,temp_file_dir_path.dir_path));
                 vec_command.push(format!("export USER_HOME_DIR='{}'",HOMEDIR.get().unwrap()));
                 vec_command.push(format!("export USER_CONFIG_DIR='{}'",CONFIGDIR.get().unwrap()));
+                vec_command.push(format!("export USER_DOWNLOADS_DIR='{}'",DOWNLOADSDIR.get().unwrap()));
             }
         }
         if self.need_rpmfusion_repo {
@@ -458,6 +462,7 @@ impl PluginTools for FlatpakInstaller {
                 vec_command.push(format!("export TARGET_DIR{}='{}'", index +1,temp_file_dir_path.dir_path));
                 vec_command.push(format!("export USER_HOME_DIR='{}'",HOMEDIR.get().unwrap()));
                 vec_command.push(format!("export USER_CONFIG_DIR='{}'",CONFIGDIR.get().unwrap()));
+                vec_command.push(format!("export USER_DOWNLOADS_DIR='{}'",DOWNLOADSDIR.get().unwrap()));
             }
         }
         vec_command.push("flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo --user".to_string());
@@ -621,6 +626,7 @@ impl PluginTools for CustomInstaller {
                 vec_command.push(format!("export TARGET_DIR{}='{}'", index +1,temp_file_dir_path.dir_path));
                 vec_command.push(format!("export USER_HOME_DIR='{}'",HOMEDIR.get().unwrap()));
                 vec_command.push(format!("export USER_CONFIG_DIR='{}'",CONFIGDIR.get().unwrap()));
+                vec_command.push(format!("export USER_DOWNLOADS_DIR='{}'",DOWNLOADSDIR.get().unwrap()));
             }
         }
         for co in self.commands_to_run_install {

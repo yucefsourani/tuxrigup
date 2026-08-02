@@ -20,6 +20,7 @@ pub static DESKTOP_TYPE: OnceLock<String> = OnceLock::new();
 pub static DISPLAY_TYPE: OnceLock<String> = OnceLock::new();
 pub static CONFIGDIR: OnceLock<String> = OnceLock::new();
 pub static HOMEDIR: OnceLock<String> = OnceLock::new();
+pub static DOWNLOADSDIR: OnceLock<String> = OnceLock::new();
 pub const  CURRENT_ARCH: &str = std::env::consts::ARCH;
 pub const  VERSION: &str = "1.0";
 
@@ -104,6 +105,13 @@ fn init_distro_info() {
     let _ = CONFIGDIR.get_or_init(|| {
         let config_dir = glib::user_config_dir();
         config_dir.to_string_lossy().to_string()
+
+    });
+    let _ = DOWNLOADSDIR.get_or_init(|| {
+        //let downloads_dir = glib::user_special_dir(glib::UserDirectory::Downloads);
+        let mut dir = glib::home_dir();
+        dir.push("Downloads");
+        dir.to_string_lossy().to_string()
 
     });
     
@@ -444,7 +452,14 @@ fn main() {
                                     if let Some(subtitle) = app_i.description() {
                                         action_row.set_subtitle(&subtitle);
                                     }
-                                    let b = gtk::Button::with_label("Launch");
+                                    let custom_button_label = l_file.custom_button_label;
+                                    let b = { 
+                                        if let Some(custom_label) = custom_button_label {
+                                            gtk::Button::with_label(custom_label)
+                                        }else{
+                                            gtk::Button::with_label("Launch")
+                                        }
+                                    };
                                     let command = app_i.executable();
                                     if command.starts_with("/usr/bin/flatpak") || command.starts_with("/bin/flatpak") {
                                         if let Some(command) = app_i.commandline() {
@@ -618,13 +633,16 @@ fn main() {
                         web_link_button.set_css_classes(&["wait-action-button","flat"]);
                         row_box.append(&web_link_button);
                     }
-                    
+                    let queue_b = gtk::Button::new();
+                    queue_b.set_label("Sequential"); 
+                    queue_b.set_css_classes(&["running-destructive-action-button","flat"]);
+                    row_box.append(&queue_b);
                     let licenses_info = metadata.licenses;
                     for license in licenses_info {
                         let license_web  = license[0];
                         let license_type = license[1];
                         let link_button  = gtk::LinkButton::with_label(&license_type,&license_web);
-                        link_button.set_css_classes(&["running-destructive-action-button","flat"]);
+                        link_button.set_css_classes(&["wait-action-button","flat"]);
                         row_box.append(&link_button);
                     }
                     
@@ -666,13 +684,17 @@ fn main() {
                         web_link_button.set_css_classes(&["wait-action-button","flat"]);
                         row_box.append(&web_link_button);
                     }
+                    let queue_b = gtk::Button::new();
+                    queue_b.set_label("Parallel"); 
+                    queue_b.set_css_classes(&["running-destructive-action-button","flat"]);
+                    row_box.append(&queue_b);
                     
                     let licenses_info = metadata.licenses;
                     for license in licenses_info {
                         let license_web  = license[0];
                         let license_type = license[1];
                         let link_button  = gtk::LinkButton::with_label(&license_type,&license_web);
-                        link_button.set_css_classes(&["running-destructive-action-button","flat"]);
+                        link_button.set_css_classes(&["wait-action-button","flat"]);
                         row_box.append(&link_button);
                     }
                     

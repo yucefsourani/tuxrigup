@@ -205,6 +205,14 @@ fn main() {
         let mut category_map: HashMap<&str,gtk::ListBox> = HashMap::new();
         let main_box_page          = gtk::Box::new(gtk::Orientation::Horizontal, 0);
         let main_page_stack        = adw::ViewStack::new();
+        let side_toolbarview       = adw::ToolbarView::new();
+        let side_searchbar         = gtk::SearchBar::new();
+        let side_searchentry       = gtk::SearchEntry::new();
+        side_searchbar.set_key_capture_widget(Some(&main_box_page));
+        side_searchbar.set_child(Some(&side_searchentry));
+        side_searchbar.connect_entry(&side_searchentry);
+        side_searchentry.set_placeholder_text(Some("Search..."));
+        side_toolbarview.add_top_bar(&side_searchbar);
         main_page_stack.set_hexpand(true);
         main_page_stack.set_vexpand(true);
         let main_page_viewswitcher = adw::ViewSwitcherSidebar::new();
@@ -212,8 +220,11 @@ fn main() {
         main_page_viewswitcher.set_halign(gtk::Align::Start);
         main_page_viewswitcher.set_size_request(140,-1);
         main_page_viewswitcher.set_stack(Some(&main_page_stack));
-        main_box_page.append(&main_page_viewswitcher);
+        side_toolbarview.set_content(Some(&main_page_viewswitcher));
+        main_box_page.append(&side_toolbarview);
         main_box_page.append(&main_page_stack);
+        
+
         
         for category in baseplugin::base::Category::get_str_list_catagory() {
             let vbox          = gtk::Box::new(gtk::Orientation::Vertical, 0);
@@ -228,6 +239,24 @@ fn main() {
             clamp.set_maximum_size(500);
             let clamp_sw      = gtk::ScrolledWindow::new();
             let clamp_listbox = gtk::ListBox::new();
+            let clone_side_searchentry = side_searchentry.clone();
+            clamp_listbox.set_filter_func(move |listboxrow| {
+                let text_to_search = clone_side_searchentry.text().trim().to_lowercase().to_string();
+                if text_to_search.len() < 3 {
+                    return true;
+                }
+                if let Some(expander_row) = listboxrow.downcast_ref::<adw::ExpanderRow>() {
+                    let title = expander_row.title().to_lowercase();
+                    let subtitle = expander_row.subtitle().to_lowercase();
+                    if title.contains(&text_to_search) || subtitle.contains(&text_to_search) {
+                        return true;
+                    }
+                    false
+                } else {
+                    true
+                }
+            });
+
             clamp_listbox.set_css_classes(&["boxed-list"]);
             clamp.set_child(Some(&clamp_sw));
             clamp_sw.set_child(Some(&clamp_listbox));
@@ -654,7 +683,11 @@ fn main() {
                 
             }
         }
-
+        side_searchentry.connect_search_changed( move |entry| {
+            for listbox in category_map.values(){
+                    listbox.invalidate_filter();
+            }
+        });
         mainwindow.present();
     });
     app.run();

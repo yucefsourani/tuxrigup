@@ -250,6 +250,7 @@ pub struct DnfInstaller {
 impl PluginTools for DnfInstaller {
     fn need_install(&self) -> bool {
         for package_name in self.packages_name {
+            let package_name = package_name.trim();
             if package_name.starts_with("/") {
                 if package_name.ends_with("/") {
                     if  !utils::fs::is_dir(package_name,true) {
@@ -319,6 +320,7 @@ impl PluginTools for DnfInstaller {
             vec_command.push(format!("{}",co));
         }
         for c in self.packages_name {
+            let c = c.trim();
             if c.starts_with("/") || c.ends_with("/") {
                 continue;
             } 
@@ -350,6 +352,7 @@ impl PluginTools for DnfInstaller {
     fn remove(&self,sender:UnboundedSender<OutMesseageType>,cancellable:gio::Cancellable) {
         let mut vec_command: Vec<String> = Vec::new();
         for c in self.packages_name {
+            let c = c.trim();
             if c.starts_with("/") || c.ends_with("/") {
                 continue;
             } 
@@ -433,6 +436,7 @@ pub struct FlatpakInstaller {
 impl PluginTools for FlatpakInstaller {
     fn need_install(&self) -> bool {
         for package_name in self.packages_name {
+            let package_name = package_name.trim();
             if package_name.starts_with("/") {
                 if package_name.ends_with("/") {
                     if  !utils::fs::is_dir(package_name,true) {
@@ -444,8 +448,14 @@ impl PluginTools for FlatpakInstaller {
                     }
                 }
             }else{
-                if !utils::command::run_command(&format!("flatpak  info {}",package_name)) {
-                    return true;
+                if let Some(new_package_name) = package_name.strip_prefix("pkexec") {
+                    if !utils::command::run_command(&format!("flatpak  info {}",new_package_name)) {
+                        return true;
+                    }
+                }else{
+                    if !utils::command::run_command(&format!("flatpak  info {}",package_name)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -484,15 +494,22 @@ impl PluginTools for FlatpakInstaller {
                 vec_command.push(format!("export USER_DOWNLOADS_DIR='{}'",DOWNLOADSDIR.get().unwrap()));
             }
         }
-        vec_command.push("flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo --user".to_string());
         for co in self.run_commands_before {
             vec_command.push(format!("{}",co));
         }
         for package_name in self.packages_name {
+            let package_name = package_name.trim();
             if package_name.starts_with("/") || package_name.ends_with("/") {
                 continue;
-            } 
-            vec_command.push(format!("flatpak  --user install flathub {} -y ",package_name));
+            } else{
+                if let Some(new_package_name) = package_name.strip_prefix("pkexec"){
+                    vec_command.push("pkexec flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo".to_string());
+                    vec_command.push(format!("pkexec flatpak  install flathub {} -y ",new_package_name));
+                }else{
+                    vec_command.push("flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo --user".to_string());
+                    vec_command.push(format!("flatpak  --user install flathub {} -y ",package_name));
+                }
+            }
         }
         for co in self.run_commands_after {
             vec_command.push(format!("{}",co));
@@ -517,11 +534,25 @@ impl PluginTools for FlatpakInstaller {
     fn remove(&self,sender:UnboundedSender<OutMesseageType>,cancellable:gio::Cancellable) {
         let mut vec_command: Vec<String> = Vec::new();
         for package_name in self.packages_name {
+            let package_name = package_name.trim();
             if package_name.starts_with("/") || package_name.ends_with("/") {
                 continue;
-            } 
-            vec_command.push(format!("flatpak  --user uninstall  {} -y --noninteractive",package_name));
+            }
+            if let Some(new_package_name) = package_name.strip_prefix("pkexec"){
+                if utils::command::run_command(&format!("flatpak  --system info {}",new_package_name)){
+                    vec_command.push(format!("pkexec flatpak   uninstall  {} -y --noninteractive",new_package_name));
+                }else {
+                    vec_command.push(format!("flatpak  --user uninstall  {} -y --noninteractive",new_package_name));
+                }
+            }else {
+                if utils::command::run_command(&format!("flatpak  --system info {}",package_name)){
+                    vec_command.push(format!("pkexec flatpak   uninstall  {} -y --noninteractive",package_name));
+                }else {
+                    vec_command.push(format!("flatpak  --user uninstall  {} -y --noninteractive",package_name));
+                }
+            }
         }
+        
         if vec_command.len() == 1 {
             utils::command::run_command_async_with_output(&vec_command[0],sender.clone(),cancellable);
         }else {

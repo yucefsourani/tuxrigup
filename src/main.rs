@@ -204,6 +204,19 @@ fn main() {
         
         let mut category_map: HashMap<&str,gtk::ListBox> = HashMap::new();
         let overlaysplitview_collapsed_button = gtk::ToggleButton::builder().icon_name("sidebar-show-symbolic").build();
+        let c_overlaysplitview_collapsed_button = overlaysplitview_collapsed_button.clone();
+        mainstack.connect_visible_child_name_notify(move |stack| {
+            if let Some(visible_child_name) = stack.visible_child_name() {
+                if visible_child_name == "mhbox" {
+                    c_overlaysplitview_collapsed_button.set_visible(true);
+                    return;
+                }else{
+                    c_overlaysplitview_collapsed_button.set_visible(false);
+                    return;
+                }
+            c_overlaysplitview_collapsed_button.set_visible(true);
+            }
+        });
         headerbar.pack_start(&overlaysplitview_collapsed_button);
         let overlaysplitview       = adw::OverlaySplitView::new();
         let clone_overlaysplitview = overlaysplitview.clone();
@@ -287,7 +300,7 @@ fn main() {
         let _ = mainstack.add_titled_with_icon(&output_box_page,Some("output"),"Output","utilities-terminal-symbolic");
         //let _ = mainstack.add_titled_with_icon(&about_box_page,Some("about"),"About","help-about-symbolic");
         settings.bind("visible-stack-child", &mainstack, "visible-child-name").build();
-        
+
 
             
 

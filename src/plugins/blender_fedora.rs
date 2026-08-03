@@ -12,34 +12,33 @@ pub fn get_plugin() -> DnfInstaller {
                                 arch                           : &["all"],
                                 distro_name                    : &["fedora"],
                                 distro_version                 : &["all"],
-                                category                       : Category::Multimedia,
+                                category                       : Category::Graphics,
                                 desktop_env                    : &["all"],
                                 display_type                   : &["all"],
-                                title                          : "Audacity",
+                                title                          : "Blender",
                                 button_install_label           : "Install",
                                 button_remove_label            : "Remove",
                                 button_install_running_label   : "Install Running",
                                 button_remove_running_label    : "Remove Running",
                                 button_waiting_label           : "Waiting...",
-                                install_yes_or_no_header       : "Run Install Audacity Freeworld Task",
-                                install_yes_or_no_label        : "Start Install Audacity Freeworld Task?",
-                                remove_yes_or_no_header        : "Run Remove Audacity Freeworld Task",
-                                remove_yes_or_no_label         : "Start Remove Audacity Freeworld Task?",
+                                install_yes_or_no_header       : "Run Install Blender Task",
+                                install_yes_or_no_label        : "Start Install Blender Task?",
+                                remove_yes_or_no_header        : "Run Remove Blender Task",
+                                remove_yes_or_no_label         : "Start Remove Blender Task?",
                                 custom_cancel_warning_message  : None,
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
-                                subtitle                       : "Record and edit audio files (freeworld version)",
-                                icon_name                      : "audacity.png",
-                                licenses                       : &[&["License\nUNKNOWN","https://www.audacityteam.org/"]],
-                                website                        : &["WebSite","https://www.audacityteam.org/"],
+                                subtitle                       : "Free and open source 3D creation suite (Fedora RPM)",
+                                icon_name                      : "Blender-icon.png",
+                                licenses                       : &[&["License\nGPL v3.0","https://www.gnu.org/licenses/gpl-3.0.html"]],
+                                website                        : &["WebSite","https://www.blender.org/"],
     };
                             
 
    DnfInstaller::create(metadataplugin,
-                         &["audacity-freeworld"],
-                         true, // install and enable rpmfusion  first 
-                         // command run before install audacity-freeworld to remove audacity package first (|| true) to force return 0 if audacity not installed
-                         &["pkexec rpm -v --nodeps -e audacity || true"], 
+                         &["blender"],
+                         false, // install and enable rpmfusion  first 
+                         &[], 
                          &[],
                          Box::new([])
                          )

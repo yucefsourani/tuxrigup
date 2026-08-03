@@ -134,6 +134,10 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::android_studio::get_plugin()),
         Box::new(plugins::anydesk::get_plugin()),
         Box::new(plugins::audacity_freeworld_fedora::get_plugin()),
+        Box::new(plugins::blender_fedora::get_plugin()),
+        Box::new(plugins::blender_flatpak::get_plugin()),
+        Box::new(plugins::brave_fedora::get_plugin()),
+        Box::new(plugins::brave_origin_fedora::get_plugin()),
     ]
 }
 

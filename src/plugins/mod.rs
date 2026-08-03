@@ -17,3 +17,7 @@ pub mod vidcutter;
 pub mod android_studio;
 pub mod anydesk;
 pub mod audacity_freeworld_fedora;
+pub mod blender_fedora;
+pub mod blender_flatpak;
+pub mod brave_fedora;
+pub mod brave_origin_fedora;

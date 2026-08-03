@@ -9,37 +9,40 @@ pub fn get_plugin() -> DnfInstaller {
                                 yes_or_no                      : false,
                                 if_true_skip                   : false,
                                 type_                          : PluginType::Installer,
-                                arch                           : &["all"],
+                                arch                           : &["x86_64"],
                                 distro_name                    : &["fedora"],
                                 distro_version                 : &["all"],
-                                category                       : Category::Multimedia,
+                                category                       : Category::Internet,
                                 desktop_env                    : &["all"],
                                 display_type                   : &["all"],
-                                title                          : "Audacity",
+                                title                          : "Brave Origin",
                                 button_install_label           : "Install",
                                 button_remove_label            : "Remove",
                                 button_install_running_label   : "Install Running",
                                 button_remove_running_label    : "Remove Running",
                                 button_waiting_label           : "Waiting...",
-                                install_yes_or_no_header       : "Run Install Audacity Freeworld Task",
-                                install_yes_or_no_label        : "Start Install Audacity Freeworld Task?",
-                                remove_yes_or_no_header        : "Run Remove Audacity Freeworld Task",
-                                remove_yes_or_no_label         : "Start Remove Audacity Freeworld Task?",
+                                install_yes_or_no_header       : "Run Install Brave Origin  Task",
+                                install_yes_or_no_label        : "Start Install Brave Origin Browser Task?",
+                                remove_yes_or_no_header        : "Run Remove Brave Origin  Task",
+                                remove_yes_or_no_label         : "Start Remove Brave Origin Browser Task?",
                                 custom_cancel_warning_message  : None,
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
-                                subtitle                       : "Record and edit audio files (freeworld version)",
-                                icon_name                      : "audacity.png",
-                                licenses                       : &[&["License\nUNKNOWN","https://www.audacityteam.org/"]],
-                                website                        : &["WebSite","https://www.audacityteam.org/"],
+                                subtitle                       : "Brave Origin Web Browser",
+                                icon_name                      : "brave_origin.png",
+                                licenses                       : &[&["License\nUNKNOWN","https://brave.com/terms-of-use/"]],
+                                website                        : &["WebSite","https://brave.com/"],
     };
                             
 
    DnfInstaller::create(metadataplugin,
-                         &["audacity-freeworld"],
+                         &["brave-origin"],
                          true, // install and enable rpmfusion  first 
-                         // command run before install audacity-freeworld to remove audacity package first (|| true) to force return 0 if audacity not installed
-                         &["pkexec rpm -v --nodeps -e audacity || true"], 
+                         // command run before install
+                         &[
+                            "pkexec echo -e '[brave-browser]\nname=Brave Browser\nbaseurl=https://brave-browser-rpm-release.s3.brave.com/$basearch\nenabled=1' > /etc/yum.repos.d/brave-browser.repo",
+                            "pkexec rpm --import https://brave-browser-rpm-release.s3.brave.com/brave-core.asc"
+                         ], 
                          &[],
                          Box::new([])
                          )

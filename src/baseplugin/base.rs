@@ -292,7 +292,8 @@ impl PluginTools for DnfInstaller {
         }
     }
     fn install(&self,sender:UnboundedSender<OutMesseageType>,cancellable:gio::Cancellable,downloads_files_info:Option<Vec<TempFileDirPath>>) {
-       let mut vec_command: Vec<String> = Vec::new();
+        let mut vec_command: Vec<String> = Vec::new();
+        vec_command.push(format!("export DNF5_FORCE_INTERACTIVE=1"));
         if let Some(downlodfiles_info) = downloads_files_info {
             for (index, temp_file_dir_path) in downlodfiles_info.iter().enumerate() {
                 vec_command.push(format!("export TARGET_FILE{}='{}'",index +1, temp_file_dir_path.file_path));
@@ -305,7 +306,7 @@ impl PluginTools for DnfInstaller {
         if self.need_rpmfusion_repo {
             let distro_version: &str = DISTRO_VERSION.get().unwrap();
             if utils::command::run_command("rpm -q rpmfusion-free-release rpmfusion-nonfree-release") == false {
-                vec_command.push(format!("pkexec dnf install  --best -y --nogpgcheck  \
+                vec_command.push(format!("pkexec stdbuf -o1 dnf install  --best -y --nogpgcheck  --best --color=never \
                     http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{}.noarch.rpm \
                     http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{}.noarch.rpm",distro_version,distro_version));
             }
@@ -316,6 +317,8 @@ impl PluginTools for DnfInstaller {
             vec_command.push(format!("pkexec dnf config-manager enable rpmfusion-nonfree-nvidia-driver"));
             vec_command.push(format!("pkexec dnf config-manager enable rpmfusion-nonfree-steam"));
         }
+        
+        
         for co in self.run_commands_before {
             vec_command.push(format!("{}",co));
         }
@@ -325,7 +328,7 @@ impl PluginTools for DnfInstaller {
                 continue;
             } 
             if utils::command::run_command(&format!("rpm -q {}",c)) == false {
-                vec_command.push(format!("pkexec dnf install {} -y",c));
+                vec_command.push(format!("pkexec stdbuf -o1  dnf install {} -y   --best --color=never",c));
             }
         }
         for co in self.run_commands_after {

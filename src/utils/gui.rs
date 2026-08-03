@@ -132,7 +132,7 @@ pub fn create_plugin_button(
     let spinner_clone1 = spinner.clone();
     spinner.start();
     spinner.set_visible(true);
-    btn.set_css_classes(&["wait-action-button"]);
+    btn.set_css_classes(&["btn-state-waiting"]);
     non_queue_task_running_state.store(true,Ordering::SeqCst);
     let c1_non_queue_task_running_state = Arc::clone(&non_queue_task_running_state);
     let c1_b_label = b_label.clone();
@@ -495,7 +495,7 @@ pub fn _queue_create_plugin_button(
     let spinner_clone1 = spinner.clone();
     spinner.start();
     spinner.set_visible(true);
-    btn.set_css_classes(&["wait-action-button"]);
+    btn.set_css_classes(&["btn-state-waiting"]);
     let c_b_label = b_label.clone();
     glib::MainContext::default().spawn_local(async move  {
         let c2_b_label = c_b_label.clone();
@@ -984,7 +984,7 @@ pub fn _queue_create_plugin_button(
                 if is_queue_busy {
                     // النظام ما زال مشغولاً، غيّر نص الزر لـ Waiting وضعه في الطابور
                     c5_b_label.set_label(_plugin_clone.lock().unwrap().metadata().button_waiting_label);
-                    _button_clone.set_css_classes(&["wait-action-button"]);
+                    _button_clone.set_css_classes(&["btn-state-waiting"]);
                     let c7_b_label    = c5_b_label.clone();
                     let _plugin_clone2 = Arc::clone(&_plugin_clone);
                     let task = Task {
@@ -1046,7 +1046,7 @@ pub fn queue_create_plugin_button(
     let spinner_clone1 = spinner.clone();
     spinner.start();
     spinner.set_visible(true);
-    btn.set_css_classes(&["wait-action-button"]);
+    btn.set_css_classes(&["btn-state-waiting"]);
     let c_b_label = b_label.clone();
     
     glib::MainContext::default().spawn_local(async move  {
@@ -1457,7 +1457,7 @@ pub fn queue_create_plugin_button(
 
             if is_queue_busy {
                 c5_b_label.set_label(&_plugin_clone.lock().unwrap().metadata().button_waiting_label);
-                _button_clone.set_css_classes(&["wait-action-button"]);
+                _button_clone.set_css_classes(&["btn-state-waiting"]);
                 let c7_b_label    = c5_b_label.clone();
                 let _plugin_clone2 = Arc::clone(&_plugin_clone);
                 let task = Task { 

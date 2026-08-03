@@ -274,7 +274,7 @@ pub fn run_command_async_with_output(command: &str, sender: UnboundedSender<OutM
                                 internal_buffer.extend_from_slice(&bytes);
                                 
                                 let mut search_pos = 0;
-                                while let Some(newline_idx) = internal_buffer[search_pos..].iter().position(|&b| b == b'\n') {
+                                while let Some(newline_idx) = internal_buffer[search_pos..].iter().position(|&b| b == b'\n' || b == b'\r') {
                                     let full_idx = search_pos + newline_idx;
                                     let line_bytes = &internal_buffer[..full_idx];
                                     

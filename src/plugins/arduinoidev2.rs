@@ -26,7 +26,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 remove_yes_or_no_header        : "Run Remove Arduino IDE V2 Task",
                                 remove_yes_or_no_label         : "Start Remove Arduino IDE V2 Task?",
                                 custom_cancel_warning_message  : None,
-                                after_success_install_message  : None,
+                                after_success_install_message  : Some("Install Arduino IDE Done.\nPlease Reboot Your System."),
                                 after_success_remove_message   : None,
                                 subtitle                       : "Open-source electronics prototyping platform\n(Flatpak User Wide)",
                                 icon_name                      : "arduino.svg",
@@ -38,7 +38,7 @@ pub fn get_plugin() -> FlatpakInstaller {
    FlatpakInstaller::create(metadataplugin,
                          &["cc.arduino.IDE2"],
                          &[],
-                         &[],
+                         &["pkexec usermod -G dialout -a $REAL_USER"], // run after install
                          Box::new([])
                          )
 

@@ -15,30 +15,30 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 category                       : Category::Developertools,
                                 desktop_env                    : &["all"],
                                 display_type                   : &["all"],
-                                title                          : "Arduino IDE",
+                                title                          : "Marker",
                                 button_install_label           : "Install",
                                 button_remove_label            : "Remove",
                                 button_install_running_label   : "Install Running",
                                 button_remove_running_label    : "Remove Running",
                                 button_waiting_label           : "Waiting...",
-                                install_yes_or_no_header       : "Run Install Arduino IDE Task",
-                                install_yes_or_no_label        : "Start Install Arduino IDE Task?",
-                                remove_yes_or_no_header        : "Run Remove Arduino IDE Task",
-                                remove_yes_or_no_label         : "Start Remove Arduino IDE Task?",
+                                install_yes_or_no_header       : "Run Install Marker Task",
+                                install_yes_or_no_label        : "Start Install Marker Task?",
+                                remove_yes_or_no_header        : "Run Remove Marker Task",
+                                remove_yes_or_no_label         : "Start Remove Marker Task?",
                                 custom_cancel_warning_message  : None,
-                                after_success_install_message  : Some("Install Arduino IDE Done.\nPlease Reboot Your System."),
+                                after_success_install_message  : None,
                                 after_success_remove_message   : None,
-                                subtitle                       : "Open-source electronics prototyping platform\n(Flatpak User Wide)",
-                                icon_name                      : "arduino.svg",
-                                licenses                       : &[&["License\nLGPL V2.1","https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"]],
-                                website                        : &["WebSite","https://www.arduino.cc/"],
+                                subtitle                       : "Powerful markdown editor for the GNOME desktop\n(Flatpak User Wide)",
+                                icon_name                      : "com.github.fabiocolacio.marker.svg",
+                                licenses                       : &[&["License\nGPL V3.0","https://www.gnu.org/licenses/gpl-3.0.html"]],
+                                website                        : &["WebSite","https://github.com/fabiocolacio/Marker"],
     };
                             
 
    FlatpakInstaller::create(metadataplugin,
-                         &["cc.arduino.arduinoide"],
+                         &["com.github.fabiocolacio.marker"],
                          &[],
-                         &["pkexec usermod -G dialout -a $REAL_USER"], // run after install
+                         &[],
                          Box::new([])
                          )
 

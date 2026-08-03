@@ -28,7 +28,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 custom_cancel_warning_message  : None,
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
-                                subtitle                       : "Electronic Quran Browser",
+                                subtitle                       : "Electronic Quran Browser\n(Flatpak User Wide)",
                                 icon_name                      : "albasheer-128.png",
                                 licenses                       : &[&["License\nGPL V3.0+","https://www.gnu.org/licenses/gpl-3.0.html"]],
                                 website                        : &["WebSite","https://github.com/yucefsourani/albasheer-electronic-quran-browser"],

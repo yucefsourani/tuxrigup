@@ -123,6 +123,17 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::albasheer::get_plugin()),
         Box::new(plugins::arduinoide::get_plugin()),
         Box::new(plugins::arduinoidev2::get_plugin()),
+        Box::new(plugins::ciano::get_plugin()),
+        Box::new(plugins::fritzing::get_plugin()),
+        Box::new(plugins::gitkraken::get_plugin()),
+        Box::new(plugins::handbrake::get_plugin()),
+        Box::new(plugins::marker::get_plugin()),
+        Box::new(plugins::mypaint::get_plugin()),
+        Box::new(plugins::pulseeffects::get_plugin()),
+        Box::new(plugins::vidcutter::get_plugin()),
+        Box::new(plugins::android_studio::get_plugin()),
+        Box::new(plugins::anydesk::get_plugin()),
+        Box::new(plugins::audacity_freeworld_fedora::get_plugin()),
     ]
 }
 

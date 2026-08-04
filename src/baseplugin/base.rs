@@ -262,8 +262,14 @@ impl PluginTools for DnfInstaller {
                     }
                 }
             }else{
-                if utils::command::run_command(&format!("rpm -q {}",package_name)) == false {
-                    return true;
+                if let Some(new_package_name) = package_name.strip_prefix("KEEP_") {
+                    if utils::command::run_command(&format!("rpm -q {}",new_package_name)) == false {
+                        return true;
+                    }
+                }else {
+                    if utils::command::run_command(&format!("rpm -q {}",package_name)) == false {
+                        return true;
+                    }
                 }
             }
         }
@@ -326,11 +332,18 @@ impl PluginTools for DnfInstaller {
             let c = c.trim();
             if c.starts_with("/") || c.ends_with("/") {
                 continue;
-            } 
-            if utils::command::run_command(&format!("rpm -q {}",c)) == false {
-                vec_command.push(format!("pkexec stdbuf -o1  dnf install {} -y   --best --color=never",c));
+            }
+            if let Some(new_package_name) = c.strip_prefix("KEEP_") {
+                if utils::command::run_command(&format!("rpm -q {}",new_package_name)) == false {
+                    vec_command.push(format!("pkexec stdbuf -o1  dnf install {} -y   --best --color=never",new_package_name));
+                }
+            }else {
+                if utils::command::run_command(&format!("rpm -q {}",c)) == false {
+                    vec_command.push(format!("pkexec stdbuf -o1  dnf install {} -y   --best --color=never",c));
+                }
             }
         }
+        println!("{:?}",vec_command);
         for co in self.run_commands_after {
             vec_command.push(format!("{}",co));
         }
@@ -358,7 +371,10 @@ impl PluginTools for DnfInstaller {
             let c = c.trim();
             if c.starts_with("/") || c.ends_with("/") {
                 continue;
-            } 
+            }
+            if let Some(_new_package_name) = c.strip_prefix("KEEP_") {
+                continue;
+            }
             if utils::command::run_command(&format!("rpm -q {}",c)) == true {        
                 vec_command.push(format!("pkexec rpm -ev  {} --nodeps --quiet",c));
             }

@@ -24,3 +24,4 @@ pub mod brave_origin_fedora;
 pub mod broadcom_fedora;
 pub mod chromium_fedora;
 pub mod codeblocks_fedora;
+pub mod codecs_fedora;

@@ -343,7 +343,7 @@ impl PluginTools for DnfInstaller {
                 }
             }
         }
-        println!("{:?}",vec_command);
+
         for co in self.run_commands_after {
             vec_command.push(format!("{}",co));
         }

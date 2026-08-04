@@ -141,6 +141,7 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::broadcom_fedora::get_plugin()),
         Box::new(plugins::chromium_fedora::get_plugin()),
         Box::new(plugins::codeblocks_fedora::get_plugin()),
+        Box::new(plugins::codecs_fedora::get_plugin()),
     ]
 }
 

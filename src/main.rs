@@ -142,6 +142,13 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::chromium_fedora::get_plugin()),
         Box::new(plugins::codeblocks_fedora::get_plugin()),
         Box::new(plugins::codecs_fedora::get_plugin()),
+        Box::new(plugins::archive_tools_fedora::get_plugin()),
+        Box::new(plugins::darktable_fedora::get_plugin()),
+        Box::new(plugins::darktable_flatpak::get_plugin()),
+        Box::new(plugins::dnf_fastestmirror::get_plugin()),
+        Box::new(plugins::dnf_keepcache::get_plugin()),
+        Box::new(plugins::kde_ffmpegthumbs_fedora::get_plugin()),
+        Box::new(plugins::xfce_ffmpegthumbnailer_fedora::get_plugin()),
     ]
 }
 

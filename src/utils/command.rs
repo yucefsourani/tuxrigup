@@ -310,7 +310,13 @@ pub fn run_command_async_with_output(command: &str, sender: UnboundedSender<OutM
 
 
 pub fn run_command(command: &str) -> bool {
-    let vec_command: Vec<&OsStr> = command.split_whitespace().map(OsStr::new).collect();
+    //let vec_command: Vec<&OsStr> = command.split_whitespace().map(OsStr::new).collect();
+    let vec_command: &[&OsStr] = &[
+            OsStr::new("sh"),
+            OsStr::new("-c"),
+            OsStr::new(command),
+        ];
+    
     let flags = gio::SubprocessFlags::STDOUT_SILENCE | gio::SubprocessFlags::STDERR_SILENCE;
     
     if let Ok(process) = gio::Subprocess::newv(&vec_command, flags) {

@@ -163,7 +163,7 @@ fn main() {
     // 2. إدخال المسار الحالي في سياق Tokio
     // المتغير _guard مهم جداً، بقاؤه حياً يعني بقاء سياق Tokio متاحاً طوال فترة عمل التطبيق
     let _guard = tokio_rt.enter();
-    let app = adw::Application::builder().application_id("com.github.yucefmsourani.gtk4_ex").build();
+    let app = adw::Application::builder().application_id("com.github.yucefsourani.tuxrigup").build();
 
     app.connect_activate(|app| {
         utils::gui::load_custom_css(CSS);

@@ -158,6 +158,15 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::bazaar_flatpak::get_plugin()),
         Box::new(plugins::gdm_settings_flatpak::get_plugin()),
         Box::new(plugins::refine_flatpak::get_plugin()),
+        Box::new(plugins::flameshot_fedora::get_plugin()),
+        Box::new(plugins::geany_fedora::get_plugin()),
+        Box::new(plugins::gimp_beta_flatpak::get_plugin()),
+        Box::new(plugins::gimp_fedora::get_plugin()),
+        Box::new(plugins::gnome_12h::get_plugin()),
+        Box::new(plugins::gnome_builder::get_plugin()),
+        Box::new(plugins::gnome_en_ara_keyboard_layout::get_plugin()),
+        Box::new(plugins::gnome_fr_ara_keyboard_layout::get_plugin()),
+        Box::new(plugins::gnome_fr_azerty_ara_keyboard_layout::get_plugin()),
         ]
 }
 
@@ -165,7 +174,7 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
 fn main() {
     init_distro_info();
 // 1. إنشاء بيئة Tokio لتعمل في الخلفية لمعالجة الشبكات
-    let tokio_rt = tokio::runtime::Runtime::new().expect("فشل في إنشاء Tokio Runtime");
+    let tokio_rt = tokio::runtime::Runtime::new().expect("Tokio Runtime Faild.");
     
     // 2. إدخال المسار الحالي في سياق Tokio
     // المتغير _guard مهم جداً، بقاؤه حياً يعني بقاء سياق Tokio متاحاً طوال فترة عمل التطبيق

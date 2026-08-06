@@ -12,7 +12,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 arch                           : &["all"],
                                 distro_name                    : &["all"],
                                 distro_version                 : &["all"],
-                                category                       : Category::System,
+                                category                       : Category::Utility,
                                 desktop_env                    : &["all"],
                                 display_type                   : &["all"],
                                 title                          : "Sitra",

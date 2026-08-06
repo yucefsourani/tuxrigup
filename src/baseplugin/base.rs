@@ -94,6 +94,7 @@ pub enum Category {
     Internet,
     Launcher,
     Education,
+    Utility,
     }
 
 impl Category {
@@ -109,12 +110,13 @@ impl Category {
             Self::Internet => "Internet",
             Self::Launcher => "Launcher",
             Self::Education => "Education",
+            Self::Utility => "Utility",
             }
         }
 
         
     pub fn get_str_list_catagory() -> &'static [&'static str] {
-        &["Launcher","WebSite","Internet","Multimedia","Graphics","Education","Developer","System","Gnome","Other"]
+        &["Launcher","WebSite","Internet","Multimedia","Graphics","Education","Developer","Utility","System","Gnome","Other"]
         }
     /*pub fn get_catagory_icon_name(category: &'static str) -> &'static str {
         match category {
@@ -128,6 +130,7 @@ impl Category {
             "Internet" => "web-browser-symbolic",
             "Launcher" => "application-x-executable-symbolic",
             "Education" => "accessories-dictionary-symbolic",
+            "Utility" => "applications-utilities-symbolic",
             _           => "action-unavailable-symbolic",
             }
         }*/
@@ -536,12 +539,19 @@ impl PluginTools for FlatpakInstaller {
             if package_name.starts_with("/") || package_name.ends_with("/") {
                 continue;
             } else{
+                let (flathub_repo,repo) = {
+                    if package_name.ends_with("beta") {
+                        ("flathub-beta","beta-repo")
+                    }else{
+                        ("flathub","repo")
+                    }
+                };
                 if let Some(new_package_name) = package_name.strip_prefix("pkexec"){
-                    vec_command.push("pkexec flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo".to_string());
-                    vec_command.push(format!("pkexec flatpak  install flathub {} -y ",new_package_name));
+                    vec_command.push(format!("pkexec flatpak remote-add --if-not-exists {0} https://dl.flathub.org/{1}/{0}.flatpakrepo",flathub_repo,repo));
+                    vec_command.push(format!("pkexec flatpak  install {} {} -y ",flathub_repo,new_package_name));
                 }else{
-                    vec_command.push("flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo --user".to_string());
-                    vec_command.push(format!("flatpak  --user install flathub {} -y ",package_name));
+                    vec_command.push(format!("pkexec flatpak remote-add --if-not-exists {0} https://dl.flathub.org/{1}/{0}.flatpakrepo --user",flathub_repo,repo));
+                    vec_command.push(format!("flatpak  --user install {} {} -y ",flathub_repo,package_name));
                 }
             }
         }

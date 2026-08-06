@@ -7,7 +7,7 @@ pub fn get_plugin() -> CustomInstaller {
         install_in_queue: false,
         
         // If true, displays a confirmation dialog before starting the install/remove process.
-        yes_or_no: true, 
+        yes_or_no: false, 
         
         // If true, this plugin will be completely ignored and not displayed in the UI.
         if_true_skip: false,
@@ -45,10 +45,10 @@ pub fn get_plugin() -> CustomInstaller {
         button_waiting_label: "",
         
         // Confirmation Dialogs
-        install_yes_or_no_header: "Enable Dnf Fastestmirror Task",
-        install_yes_or_no_label: "Enable Dnf Fastestmirror?",
-        remove_yes_or_no_header: "Disable Dnf Fastestmirror Task",
-        remove_yes_or_no_label: "Disable Dnf Fastestmirror?",
+        install_yes_or_no_header: "",
+        install_yes_or_no_label: "",
+        remove_yes_or_no_header: "",
+        remove_yes_or_no_label: "",
         
         // Optional Messages
         custom_cancel_warning_message: None, // Custom warning if the user cancels the task

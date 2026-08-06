@@ -23,15 +23,7 @@ foreach i : icon_sizes
   )
 endforeach
 
-install_data(
-  'icons/hicolor/scalable/apps/com.github.yucefsourani.tuxrigup.svg',
-  install_dir: datadir / 'icons/hicolor/scalable/apps'
-)
 
-install_data(
-  'icons/hicolor/symbolic/apps/com.github.yucefsourani.tuxrigup-symbolic.svg',
-  install_dir: datadir / 'icons/hicolor/symbolic/apps'
-)
 
 # نقل الأيقونة المحددة إلى مسار pixmaps
 install_data(

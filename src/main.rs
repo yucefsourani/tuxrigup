@@ -12,7 +12,7 @@ use gio::prelude::IconExt;
 mod plugins;
 mod baseplugin;
 mod utils;
-mod widgets;
+//mod widgets;
 
 pub static DISTRO_NAME: OnceLock<String> = OnceLock::new();
 pub static DISTRO_VERSION: OnceLock<String> = OnceLock::new();
@@ -149,7 +149,9 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::dnf_keepcache::get_plugin()),
         Box::new(plugins::kde_ffmpegthumbs_fedora::get_plugin()),
         Box::new(plugins::xfce_ffmpegthumbnailer_fedora::get_plugin()),
-    ]
+        Box::new(plugins::firefox_fedora::get_plugin()),
+        Box::new(plugins::firefox_flatpak::get_plugin()),
+        ]
 }
 
 
@@ -283,7 +285,7 @@ fn main() {
             clamp.set_margin_start(5);
             clamp.set_margin_end(5);
             clamp.set_vexpand(true);
-            clamp.set_maximum_size(500);
+            clamp.set_maximum_size(600);
             let clamp_sw      = gtk::ScrolledWindow::new();
             let clamp_listbox = gtk::ListBox::new();
             let empty_status = adw::StatusPage::builder()
@@ -298,14 +300,16 @@ fn main() {
             clamp_sw.set_child(Some(&clamp_listbox));
             vbox.append(&clamp);
             let page  = main_page_stack.add_titled(&vbox,Some(category),category);
-            
+            //page.set_icon_name(Some(baseplugin::base::Category::get_catagory_icon_name(category)));
+
             
             let page_clone  = page.clone();
             let clamp_listbox_clone = clamp_listbox.clone();
+            let main_page_stack_clone = main_page_stack.clone();
            side_searchentry.connect_search_changed(move |entry| {
                 let text_to_search = entry.text().trim().to_lowercase();
                 let mut has_results = false;
-
+                
                 if text_to_search.len() < 3 {
                     let mut child = clamp_listbox_clone.first_child();
                     while let Some(widget) = child {
@@ -336,12 +340,18 @@ fn main() {
                     child = widget.next_sibling();
                 }
                 page_clone.set_visible(has_results);
+                if has_results {
+                    let page_name = page_clone.name().unwrap();
+                    if page_name !=  main_page_stack_clone.visible_child_name().unwrap(){
+                        main_page_stack_clone.set_visible_child_name(&page_name);
+                    }
+                }
             });
             category_map.insert(category,clamp_listbox);
         }
         
         
-        
+        settings.bind("navigation-sidebar-visible-stack-child", &main_page_stack, "visible-child-name").build();
         let output_box_page  = gtk::Box::new(gtk::Orientation::Vertical, 0);
         //let about_box_page   = gtk::Box::new(gtk::Orientation::Vertical, 0);
         let _ = mainstack.add_titled_with_icon(&overlaysplitview,Some("mhbox"),"Main","application-x-executable-symbolic");
@@ -476,6 +486,10 @@ fn main() {
                                             gtk::Button::with_label("Launch")
                                         }
                                     };
+                                    b.set_valign(gtk::Align::Center);
+                                    b.set_halign(gtk::Align::Center);
+                                    b.set_width_request(85);
+                                    b.set_height_request(35);
                                     let command = app_i.executable();
                                     if command.starts_with("/usr/bin/flatpak") || command.starts_with("/bin/flatpak") {
                                         if let Some(command) = app_i.commandline() {
@@ -516,23 +530,22 @@ fn main() {
                                     type_b.set_css_classes(&["running-destructive-action-button","flat"]);
                                     row_box.append(&type_b);
                                     action_row.add_row(&row_box);
-                                    
-                                    let icon: widgets::ImagePaint  = {
+                                    let icon: gtk::Image  = {
                                         if let Some(icon_path) = utils::fs::get_icon_path(l_file.icon_name)  {
-                                            widgets::ImagePaint::new(icon_path, 50.0, 50.0,None)
+                                            gtk::Image::from_file(icon_path)
                                         }else{
                                             if let Some(icon_) = app_i.icon(){
                                                 if let Some(icon_name) = icon_.to_string(){
-                                                    widgets::ImagePaint::new("", 50.0, 50.0,Some(format!("{}",icon_name)))
+                                                    gtk::Image::from_icon_name(&icon_name)
                                                 }else {
-                                                    widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
+                                                    gtk::Image::from_icon_name("image-missing-symbolic")
                                                 }
                                             }else{
-                                                widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
+                                                gtk::Image::from_icon_name("image-missing-symbolic")
                                             }
                                         }
                                     };
-
+                                    icon.set_icon_size(gtk::IconSize::Large);
                                     icon.set_valign(gtk::Align::Center);
                                     action_row.add_prefix(&icon);
                                     let category = baseplugin::base::Category::get_catagory_label(l_file.category);
@@ -613,11 +626,12 @@ fn main() {
                     
                     let icon = {
                         if let Some(icon_path) = utils::fs::get_icon_path(metadata.icon_name) {
-                            widgets::ImagePaint::new(icon_path, 50.0, 50.0,None)
+                            gtk::Image::from_file(icon_path)
                         }else {
-                            widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
+                            gtk::Image::from_icon_name("image-missing-symbolic")
                         }
                     };
+                    icon.set_icon_size(gtk::IconSize::Large);
                     icon.set_valign(gtk::Align::Center);
                     action_row.add_prefix(&icon);
                     
@@ -715,11 +729,12 @@ fn main() {
                     
                     let icon = {
                         if let Some(icon_path) = utils::fs::get_icon_path(metadata.icon_name) {
-                            widgets::ImagePaint::new(icon_path, 50.0, 50.0,None)
+                            gtk::Image::from_file(icon_path)
                         }else {
-                            widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
+                            gtk::Image::from_icon_name("image-missing-symbolic")
                         }
                     };
+                    icon.set_icon_size(gtk::IconSize::Large);
                     icon.set_valign(gtk::Align::Center);
                     action_row.add_prefix(&icon);
 
@@ -781,6 +796,9 @@ fn main() {
                     }
                 };
                 b.set_valign(gtk::Align::Center);
+                b.set_halign(gtk::Align::Center);
+                b.set_width_request(85);
+                b.set_height_request(35);
                 b.set_css_classes(&["btn-state-install"]);
                 b.set_has_frame(false);
                 action_row.add_suffix(&b);
@@ -796,15 +814,15 @@ fn main() {
                 type_b.set_css_classes(&["running-destructive-action-button","flat"]);
                 row_box.append(&type_b);
                 action_row.add_row(&row_box);
-                
+
                 let icon = {
                     if let Some(icon_path) = utils::fs::get_icon_path(website_plugin.icon_name) {
-                        widgets::ImagePaint::new(icon_path, 50.0, 50.0,None)
-                    }else{
-                        widgets::ImagePaint::new("", 50.0, 50.0,Some("image-missing-symbolic".to_string()))
+                        gtk::Image::from_file(icon_path)
+                    }else {
+                        gtk::Image::from_icon_name("image-missing-symbolic")
                     }
-                    
                 };
+                icon.set_icon_size(gtk::IconSize::Large);
                 icon.set_valign(gtk::Align::Center);
                 action_row.add_prefix(&icon);
 

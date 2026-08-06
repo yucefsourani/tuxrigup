@@ -12,10 +12,10 @@ pub fn get_plugin() -> DnfInstaller {
                                 arch                           : &["all"],
                                 distro_name                    : &["fedora"],
                                 distro_version                 : &["all"],
-                                category                       : Category::System,
-                                desktop_env                    : &["xfce"],
+                                category                       : Category::Internet,
+                                desktop_env                    : &["all"],
                                 display_type                   : &["all"],
-                                title                          : "XFCE Video Thumbnails",
+                                title                          : "Firefox",
                                 button_install_label           : "Install",
                                 button_remove_label            : "Remove",
                                 button_install_running_label   : "Install Running",
@@ -28,16 +28,16 @@ pub fn get_plugin() -> DnfInstaller {
                                 custom_cancel_warning_message  : None,
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
-                                subtitle                       : "Packages For XFCE File Manager Video Thumbnails",
-                                icon_name                      : "1200px-Thunar.svg.png",
-                                licenses                       : &[&["License\nUNKNOWN",""]],
-                                website                        : &["WebSite",""],
+                                subtitle                       : "Fast, Private and Safe Web Browser (Fedora RPM)",
+                                icon_name                      : "appicns_Firefox.png",
+                                licenses                       : &[&["License\nMPL-2.0","https://www.mozilla.org/en-US/MPL/2.0/"]],
+                                website                        : &["WebSite","https://www.mozilla.org/en-US/firefox/"],
     };
                             
 
    DnfInstaller::create(metadataplugin,
-                         &["tumbler", "tumbler-extras", "ffmpegthumbnailer"],
-                         true, // install and enable rpmfusion  first 
+                         &["firefox"],
+                         false, // install and enable rpmfusion  first 
                          &[], 
                          &[],
                          Box::new([])

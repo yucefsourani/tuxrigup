@@ -116,6 +116,21 @@ impl Category {
     pub fn get_str_list_catagory() -> &'static [&'static str] {
         &["Launcher","WebSite","Internet","Multimedia","Graphics","Education","Developer","System","Gnome","Other"]
         }
+    /*pub fn get_catagory_icon_name(category: &'static str) -> &'static str {
+        match category {
+            "WebSite" => "insert-link-symbolic",
+            "Developer" => "utilities-terminal-symbolic",
+            "Multimedia" => "applications-multimedia-symbolic",
+            "Graphics" => "applications-graphics-symbolic",
+            "Other" => "preferences-other-symbolic",
+            "System" => "applications-system-symbolic",
+            "Gnome" => "preferences-desktop-appearance-symbolic",
+            "Internet" => "web-browser-symbolic",
+            "Launcher" => "application-x-executable-symbolic",
+            "Education" => "accessories-dictionary-symbolic",
+            _           => "action-unavailable-symbolic",
+            }
+        }*/
     }
 
 

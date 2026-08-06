@@ -32,3 +32,5 @@ pub mod dnf_fastestmirror;
 pub mod dnf_keepcache;
 pub mod kde_ffmpegthumbs_fedora;
 pub mod xfce_ffmpegthumbnailer_fedora;
+pub mod firefox_fedora;
+pub mod firefox_flatpak;

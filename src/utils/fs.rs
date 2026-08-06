@@ -46,6 +46,7 @@ pub fn is_dir(path: &str,ignore_symlink:bool) -> bool {
     false
 }
 
+#[allow(dead_code)]
 pub fn is_exists(path: &str) -> bool {
     if let Ok(is_exists) = fs::exists(path) {
         is_exists

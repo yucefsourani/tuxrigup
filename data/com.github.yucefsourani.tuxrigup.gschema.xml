@@ -17,7 +17,7 @@
       <default>"mhbox"</default>
     </key>
     <key name="navigation-sidebar-visible-stack-child" type="s">
-      <default>"Multimedia"</default>
+      <default>"Launcher"</default>
     </key>
   </schema>
 </schemalist>

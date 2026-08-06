@@ -151,6 +151,8 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::xfce_ffmpegthumbnailer_fedora::get_plugin()),
         Box::new(plugins::firefox_fedora::get_plugin()),
         Box::new(plugins::firefox_flatpak::get_plugin()),
+        Box::new(plugins::sitra_flatpak::get_plugin()),
+        Box::new(plugins::gradia_flatpak::get_plugin()),
         ]
 }
 

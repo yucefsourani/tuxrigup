@@ -34,3 +34,5 @@ pub mod kde_ffmpegthumbs_fedora;
 pub mod xfce_ffmpegthumbnailer_fedora;
 pub mod firefox_fedora;
 pub mod firefox_flatpak;
+pub mod sitra_flatpak;
+pub mod gradia_flatpak;

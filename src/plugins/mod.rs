@@ -36,3 +36,8 @@ pub mod firefox_fedora;
 pub mod firefox_flatpak;
 pub mod sitra_flatpak;
 pub mod gradia_flatpak;
+pub mod flatseal_flatpak;
+pub mod gnome_extension_m_flatpak;
+pub mod bazaar_flatpak;
+pub mod gdm_settings_flatpak;
+pub mod refine_flatpak;

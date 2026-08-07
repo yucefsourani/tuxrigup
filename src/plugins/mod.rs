@@ -55,3 +55,5 @@ pub mod gnome_nautilus_directories_first;
 pub mod gnome_show_battery_precentage;
 pub mod gnome_sound_over_amplified;
 pub mod gnome_tap_to_click;
+pub mod godot_flatpak;
+pub mod google_chrome_fedora;

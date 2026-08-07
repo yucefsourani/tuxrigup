@@ -29,7 +29,7 @@ pub fn get_plugin() -> DnfInstaller {
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
                                 subtitle                       : "Fonts For Support Arabic Language",
-                                icon_name                      : "",
+                                icon_name                      : "arabic-markup.png",
                                 licenses                       : &[&["License\nUNKNOWN",""]],
                                 website                        : &["WebSite",""],
     };

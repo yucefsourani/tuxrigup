@@ -28,7 +28,7 @@ pub fn get_plugin() -> CustomInstaller {
         custom_cancel_warning_message: None,
         after_success_install_message: None,
         after_success_remove_message: None,
-        subtitle: "Multimedia coder/decoder",
+        subtitle: "Multimedia coder/decoder + mesa freeworld drivers/vulkan",
         icon_name: "codecs.png",
         licenses: &[&["License\nUNKNOWN", ""]],
         website: &[],
@@ -55,6 +55,10 @@ pub fn get_plugin() -> CustomInstaller {
         "pkexec rpm -v --nodeps -e libswresample-free || true",
         "pkexec rpm -v --nodeps -e libpostproc-free   || true",
         "pkexec rpm -v --nodeps -e libswscale-free    || true",
+        "pkexec rpm -v --nodeps -e mesa-va-drivers    || true",
+        "pkexec rpm -v --nodeps -e mesa-vdpau-drivers || true",
+        "pkexec rpm -v --nodeps -e mesa-vulkan-drivers.i686 || true",
+        "pkexec rpm -v --nodeps -e mesa-vulkan-drivers  || true",
         static_command,
         "pkexec dnf config-manager enable  rpmfusion-free",
         "pkexec dnf config-manager enable  rpmfusion-free-updates",
@@ -69,6 +73,7 @@ pub fn get_plugin() -> CustomInstaller {
         "pkexec stdbuf -o1 dnf install ffmpeg -y --best --color=never",
         "pkexec stdbuf -o1 dnf install ffmpeg-libs -y --best --color=never",
         "pkexec stdbuf -o1 dnf install gstreamer1-plugins-bad-free-extras -y --best --color=never",
+        "pkexec stdbuf -o1 dnf install mesa-va-drivers-freeworld intel-media-driver mesa-vulkan-drivers-freeworld.i686 mesa-vulkan-drivers-freeworld libva-intel-driver mesa-va-drivers-freeworld.i686 libva-nvidia-driver libva-nvidia-driver.i686  -y --best --color=never",
     ];
 
     let static_commands_array: &'static [&'static str] = Box::leak(commands_vec.into_boxed_slice());

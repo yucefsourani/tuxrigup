@@ -177,6 +177,7 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::inkscape_fedora::get_plugin()),
         Box::new(plugins::kdeconnect_fedora::get_plugin()),
         Box::new(plugins::kdenlive_fedora::get_plugin()),
+        Box::new(plugins::krita_fedora::get_plugin()),
         ]
 }
 

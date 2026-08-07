@@ -162,11 +162,16 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::geany_fedora::get_plugin()),
         Box::new(plugins::gimp_beta_flatpak::get_plugin()),
         Box::new(plugins::gimp_fedora::get_plugin()),
-        Box::new(plugins::gnome_12h::get_plugin()),
         Box::new(plugins::gnome_builder::get_plugin()),
         Box::new(plugins::gnome_en_ara_keyboard_layout::get_plugin()),
         Box::new(plugins::gnome_fr_ara_keyboard_layout::get_plugin()),
         Box::new(plugins::gnome_fr_azerty_ara_keyboard_layout::get_plugin()),
+        Box::new(plugins::fonts_for_ara::get_plugin()),
+        Box::new(plugins::gnome_12h::get_plugin()),
+        Box::new(plugins::gnome_nautilus_directories_first::get_plugin()),
+        Box::new(plugins::gnome_show_battery_precentage::get_plugin()),
+        Box::new(plugins::gnome_sound_over_amplified::get_plugin()),
+        Box::new(plugins::gnome_tap_to_click::get_plugin()),
         ]
 }
 

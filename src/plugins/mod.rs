@@ -50,3 +50,8 @@ pub mod gnome_builder;
 pub mod gnome_en_ara_keyboard_layout;
 pub mod gnome_fr_ara_keyboard_layout;
 pub mod gnome_fr_azerty_ara_keyboard_layout;
+pub mod fonts_for_ara;
+pub mod gnome_nautilus_directories_first;
+pub mod gnome_show_battery_precentage;
+pub mod gnome_sound_over_amplified;
+pub mod gnome_tap_to_click;

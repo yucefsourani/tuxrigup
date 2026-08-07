@@ -29,7 +29,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
                                 subtitle                       : "Refine helps discover advanced and experimental features in GNOME.\n(Flatpak User Wide)",
-                                icon_name                      : "page.tesk.Refine.svg",
+                                icon_name                      : "page.tesk.Refine.png",
                                 licenses                       : &[&["License\nGPL V3.0","https://www.gnu.org/licenses/gpl-3.0.html"]],
                                 website                        : &["WebSite","https://tesk.page/refine/"],
     };

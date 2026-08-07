@@ -29,7 +29,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
                                 subtitle                       : "Change GDM Settings; Apply theme and background, change cursor theme, icon theme and night light settings, among other things.\n(Flatpak User Wide)",
-                                icon_name                      : "io.github.realmazharhussain.GdmSettings.svg",
+                                icon_name                      : "io.github.realmazharhussain.GdmSettings.png",
                                 licenses                       : &[&["License\nGPL V3.0","https://www.gnu.org/licenses/gpl-3.0.html"]],
                                 website                        : &["WebSite","https://gdm-settings.github.io/"],
     };

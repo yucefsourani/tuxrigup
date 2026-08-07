@@ -29,7 +29,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
                                 subtitle                       : "Flatseal is a graphical utility to review and modify permissions from your Flatpak applications.\n(Flatpak User Wide)",
-                                icon_name                      : "com.github.tchx84.Flatseal.svg",
+                                icon_name                      : "com.github.tchx84.Flatseal.png",
                                 licenses                       : &[&["License\nGPL V3.0","https://www.gnu.org/licenses/gpl-3.0.html"]],
                                 website                        : &["WebSite","https://github.com/tchx84/flatseal"],
     };

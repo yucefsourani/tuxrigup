@@ -29,7 +29,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
                                 subtitle                       : "Powerful markdown editor for the GNOME desktop\n(Flatpak User Wide)",
-                                icon_name                      : "com.github.fabiocolacio.marker.svg",
+                                icon_name                      : "com.github.fabiocolacio.marker.png",
                                 licenses                       : &[&["License\nGPL V3.0","https://www.gnu.org/licenses/gpl-3.0.html"]],
                                 website                        : &["WebSite","https://github.com/fabiocolacio/Marker"],
     };

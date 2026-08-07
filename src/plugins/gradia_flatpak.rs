@@ -29,7 +29,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
                                 subtitle                       : "Gradia helps you get your screenshots ready for sharing, whether quickly with friends or colleagues, or professionally with the entire world.\n(Flatpak User Wide)",
-                                icon_name                      : "be.alexandervanhee.gradia.Source.svg",
+                                icon_name                      : "be.alexandervanhee.gradia.Source.png",
                                 licenses                       : &[&["License\nGPL V3.0","https://www.gnu.org/licenses/gpl-3.0.html"]],
                                 website                        : &["WebSite","https://gradia.alexandervanhee.be/"],
     };

@@ -56,7 +56,7 @@ pub fn get_plugin() -> CustomInstaller {
         after_success_remove_message: None,  // e.g., Some("Remove Done.") to show a Toast notification
         
         // Metadata
-        icon_name: "input-touchpad.svg", // Image file name in the 'images' folder
+        icon_name: "input-touchpad.png", // Image file name in the 'images' folder
         licenses: &[],
         website: &[],
     };

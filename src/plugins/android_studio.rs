@@ -29,7 +29,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
                                 subtitle                       : "Integrated development environment for Google's Android platform\n(Flatpak User Wide)",
-                                icon_name                      : "Android_Studio.svg.png",
+                                icon_name                      : "Android_Studio.png",
                                 licenses                       : &[&["License\nProprietary","https://developer.android.com/studio/"]],
                                 website                        : &["WebSite","https://developer.android.com/studio/"],
     };

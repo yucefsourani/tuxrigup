@@ -59,3 +59,4 @@ pub mod godot_flatpak;
 pub mod google_chrome_fedora;
 pub mod inkscape_fedora;
 pub mod kdeconnect_fedora;
+pub mod kdenlive_fedora;

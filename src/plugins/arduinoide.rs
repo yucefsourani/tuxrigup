@@ -29,7 +29,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 after_success_install_message  : Some("Install Arduino IDE Done.\nPlease Reboot Your System."),
                                 after_success_remove_message   : None,
                                 subtitle                       : "Open-source electronics prototyping platform\n(Flatpak User Wide)",
-                                icon_name                      : "arduino.svg",
+                                icon_name                      : "arduino.png",
                                 licenses                       : &[&["License\nLGPL V2.1","https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"]],
                                 website                        : &["WebSite","https://www.arduino.cc/"],
     };

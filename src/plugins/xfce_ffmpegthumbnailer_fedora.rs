@@ -29,7 +29,7 @@ pub fn get_plugin() -> DnfInstaller {
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
                                 subtitle                       : "Packages For XFCE File Manager Video Thumbnails",
-                                icon_name                      : "1200px-Thunar.svg.png",
+                                icon_name                      : "1200px-Thunar.png.png",
                                 licenses                       : &[&["License\nUNKNOWN",""]],
                                 website                        : &["WebSite",""],
     };

@@ -29,7 +29,7 @@ pub fn get_plugin() -> FlatpakInstaller {
                                 after_success_install_message  : None,
                                 after_success_remove_message   : None,
                                 subtitle                       : "A fast and modern app store for Linux with a focus on discovering and installing Flatpak apps and add-ons, particularly from Flathub. \n(Flatpak User Wide)",
-                                icon_name                      : "io.github.kolunmi.Bazaar.svg",
+                                icon_name                      : "io.github.kolunmi.Bazaar.png",
                                 licenses                       : &[&["License\nGPL V3.0","https://www.gnu.org/licenses/gpl-3.0.html"]],
                                 website                        : &["WebSite","https://usebazaar.org/"],
     };

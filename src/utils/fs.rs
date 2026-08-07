@@ -122,7 +122,8 @@ fn parser_commands(commands:  Vec<String>) -> CommandToTempFileResult {
                command.starts_with("export USER_HOME_DIR") ||
                command.starts_with("export USER_CONFIG_DIR") ||
                command.starts_with("USER_HOME_DIR") ||
-               command.starts_with("USER_CONFIG_DIR")
+               command.starts_with("USER_CONFIG_DIR") ||
+               command.starts_with("export DNF5_FORCE_INTERACTIVE")
                {
                 vec_commands.push(command.trim().to_string());
                 vec_target_location.push(command.trim().to_string());

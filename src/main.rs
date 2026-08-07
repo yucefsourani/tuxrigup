@@ -154,7 +154,7 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::sitra_flatpak::get_plugin()),
         Box::new(plugins::gradia_flatpak::get_plugin()),
         Box::new(plugins::flatseal_flatpak::get_plugin()),
-        Box::new(plugins::gnome_extension_m_flatpak::get_plugin()),
+        Box::new(plugins::gnome_extensions_m_flatpak::get_plugin()),
         Box::new(plugins::bazaar_flatpak::get_plugin()),
         Box::new(plugins::gdm_settings_flatpak::get_plugin()),
         Box::new(plugins::refine_flatpak::get_plugin()),
@@ -174,6 +174,8 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::gnome_tap_to_click::get_plugin()),
         Box::new(plugins::godot_flatpak::get_plugin()),
         Box::new(plugins::google_chrome_fedora::get_plugin()),
+        Box::new(plugins::inkscape_fedora::get_plugin()),
+        Box::new(plugins::kdeconnect_fedora::get_plugin()),
         ]
 }
 

@@ -330,7 +330,7 @@ impl PluginTools for DnfInstaller {
         if self.need_rpmfusion_repo {
             let distro_version: &str = DISTRO_VERSION.get().unwrap();
             if utils::command::run_command("rpm -q rpmfusion-free-release rpmfusion-nonfree-release") == false {
-                vec_command.push(format!("pkexec stdbuf -o1 dnf install  --best -y --nogpgcheck  --best --color=never \
+                vec_command.push(format!("pkexec stdbuf -o1 dnf install  --best -y --nogpgcheck  --color=never \
                     http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-{}.noarch.rpm \
                     http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-{}.noarch.rpm",distro_version,distro_version));
             }

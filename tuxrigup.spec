@@ -1,5 +1,5 @@
 Name:           tuxrigup
-Version:        1.0
+Version:        1.50
 Release:        1%{?dist}
 Summary:        The Essential Post-Setup & Workstation Tuning Suite for Linux
 
@@ -28,8 +28,6 @@ and optimizing your Linux workstation.
 %autosetup -n %{name}-%{version}
 
 %build
-# ملاحظة: يعتمد هذا البناء على الاتصال بالشبكة لجلب الحزم عبر Cargo.
-# للأنظمة المغلقة يجب استخدام %cargo_prep لتجهيز الحزم محلياً.
 %meson
 %meson_build
 
@@ -52,5 +50,5 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/com.githu
 %{_datadir}/tuxrigup/
 
 %changelog
-* Thu Jul 30 2026 Yucef Sourani <yucefsourani@gmail.com> - 1.0-1
+* Thu Jul 30 2026 Yucef Sourani <yucef.m.sourani@gmail.com> - 1.50-1
 - Initial release.

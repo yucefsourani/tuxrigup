@@ -22,7 +22,7 @@ pub static CONFIGDIR: OnceLock<String> = OnceLock::new();
 pub static HOMEDIR: OnceLock<String> = OnceLock::new();
 pub static DOWNLOADSDIR: OnceLock<String> = OnceLock::new();
 pub const  CURRENT_ARCH: &str = std::env::consts::ARCH;
-pub const  VERSION: &str = "1.0";
+pub const  VERSION: &str = "1.50";
 
 pub const CSS: &str  = "
 .wait-action-button,
@@ -120,9 +120,16 @@ fn init_distro_info() {
 pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
     vec![
         Box::new(plugins::xdm::get_plugin()),
+        Box::new(plugins::telegram_flatpak::get_plugin()),
+        Box::new(plugins::qbittorrent_fedora::get_plugin()),
         Box::new(plugins::albasheer::get_plugin()),
+        Box::new(plugins::geany_fedora::get_plugin()),
+        Box::new(plugins::gnome_builder::get_plugin()),
+        Box::new(plugins::pycharmcommunity_fedora::get_plugin()),
         Box::new(plugins::arduinoide::get_plugin()),
         Box::new(plugins::arduinoidev2::get_plugin()),
+        Box::new(plugins::codecs_fedora::get_plugin()),
+        Box::new(plugins::vlc_fedora::get_plugin()),
         Box::new(plugins::ciano::get_plugin()),
         Box::new(plugins::fritzing::get_plugin()),
         Box::new(plugins::gitkraken::get_plugin()),
@@ -133,6 +140,8 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::vidcutter::get_plugin()),
         Box::new(plugins::android_studio::get_plugin()),
         Box::new(plugins::anydesk::get_plugin()),
+        Box::new(plugins::teamviewer_fedora::get_plugin()),
+        Box::new(plugins::virtualbox_fedora::get_plugin()),
         Box::new(plugins::audacity_freeworld_fedora::get_plugin()),
         Box::new(plugins::blender_fedora::get_plugin()),
         Box::new(plugins::blender_flatpak::get_plugin()),
@@ -141,7 +150,6 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::broadcom_fedora::get_plugin()),
         Box::new(plugins::chromium_fedora::get_plugin()),
         Box::new(plugins::codeblocks_fedora::get_plugin()),
-        Box::new(plugins::codecs_fedora::get_plugin()),
         Box::new(plugins::archive_tools_fedora::get_plugin()),
         Box::new(plugins::darktable_fedora::get_plugin()),
         Box::new(plugins::darktable_flatpak::get_plugin()),
@@ -152,18 +160,16 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::firefox_fedora::get_plugin()),
         Box::new(plugins::librewolf_fedora::get_plugin()),
         Box::new(plugins::firefox_flatpak::get_plugin()),
+        Box::new(plugins::bazaar_flatpak::get_plugin()),
+        Box::new(plugins::flatseal_flatpak::get_plugin()),
         Box::new(plugins::sitra_flatpak::get_plugin()),
         Box::new(plugins::gradia_flatpak::get_plugin()),
-        Box::new(plugins::flatseal_flatpak::get_plugin()),
         Box::new(plugins::gnome_extensions_m_flatpak::get_plugin()),
-        Box::new(plugins::bazaar_flatpak::get_plugin()),
         Box::new(plugins::gdm_settings_flatpak::get_plugin()),
         Box::new(plugins::refine_flatpak::get_plugin()),
         Box::new(plugins::flameshot_fedora::get_plugin()),
-        Box::new(plugins::geany_fedora::get_plugin()),
         Box::new(plugins::gimp_beta_flatpak::get_plugin()),
         Box::new(plugins::gimp_fedora::get_plugin()),
-        Box::new(plugins::gnome_builder::get_plugin()),
         Box::new(plugins::gnome_en_ara_keyboard_layout::get_plugin()),
         Box::new(plugins::gnome_fr_ara_keyboard_layout::get_plugin()),
         Box::new(plugins::gnome_fr_azerty_ara_keyboard_layout::get_plugin()),
@@ -183,7 +189,11 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::natron_flatpak::get_plugin()),
         Box::new(plugins::opera_fedora::get_plugin()),
         Box::new(plugins::m_edge_fedora::get_plugin()),
-        Box::new(plugins::pycharmcommunity_fedora::get_plugin()),
+        Box::new(plugins::vivaldi_fedora::get_plugin()),
+        Box::new(plugins::scratch3_flatpak::get_plugin()),
+        Box::new(plugins::sublime_flatpak::get_plugin()),
+        Box::new(plugins::tailscale_fedora::get_plugin()),
+
         ]
 }
 

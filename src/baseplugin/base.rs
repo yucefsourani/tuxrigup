@@ -317,7 +317,7 @@ impl PluginTools for DnfInstaller {
     }
     fn install(&self,sender:UnboundedSender<OutMesseageType>,cancellable:gio::Cancellable,downloads_files_info:Option<Vec<TempFileDirPath>>) {
         let mut vec_command: Vec<String> = Vec::new();
-        vec_command.push(format!("export DNF5_FORCE_INTERACTIVE=1"));
+        //vec_command.push(format!("export DNF5_FORCE_INTERACTIVE=1"));
         if let Some(downlodfiles_info) = downloads_files_info {
             for (index, temp_file_dir_path) in downlodfiles_info.iter().enumerate() {
                 vec_command.push(format!("export TARGET_FILE{}='{}'",index +1, temp_file_dir_path.file_path));

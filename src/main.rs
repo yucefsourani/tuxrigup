@@ -150,6 +150,7 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::kde_ffmpegthumbs_fedora::get_plugin()),
         Box::new(plugins::xfce_ffmpegthumbnailer_fedora::get_plugin()),
         Box::new(plugins::firefox_fedora::get_plugin()),
+        Box::new(plugins::librewolf_fedora::get_plugin()),
         Box::new(plugins::firefox_flatpak::get_plugin()),
         Box::new(plugins::sitra_flatpak::get_plugin()),
         Box::new(plugins::gradia_flatpak::get_plugin()),
@@ -178,6 +179,11 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::kdeconnect_fedora::get_plugin()),
         Box::new(plugins::kdenlive_fedora::get_plugin()),
         Box::new(plugins::krita_fedora::get_plugin()),
+        Box::new(plugins::mpv_fedora::get_plugin()),
+        Box::new(plugins::natron_flatpak::get_plugin()),
+        Box::new(plugins::opera_fedora::get_plugin()),
+        Box::new(plugins::m_edge_fedora::get_plugin()),
+        Box::new(plugins::pycharmcommunity_fedora::get_plugin()),
         ]
 }
 

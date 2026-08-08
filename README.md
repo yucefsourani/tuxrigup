@@ -10,6 +10,14 @@ The primary goal of this project was hands-on learning to explore **Rust**, **GT
 As a result, there is certainly room for refactoring and code cleanup. However, as long as the application functions properly, keeping the codebase straightforward is preferred over overcomplicating things—especially given its original purpose as an educational exercise.
 
 
+## 📌 Versioning
+
+* **Current Version:** `1.50`
+* **Target Environment:** Built against **GNOME 50** features (`gtk4` features `gnome_50`), corresponding to the current stable Fedora Linux release.
+
+
+
+
 ## ⚠️ ملاحظة حول التطوير / مشروع قيد الإنجاز
 
 هذا البرنامج قيد التطوير حالياً، وهو محاولة لإعادة كتابة برنامج [arfedora-welcome](https://github.com/yucefsourani/arfedora-welcome) وتحويله من لغة Python إلى Rust مع إجراء بعض التعديلات.
@@ -18,6 +26,12 @@ As a result, there is certainly room for refactoring and code cleanup. However, 
 
 بناءً على ذلك، هناك العديد من المواضع التي تحتاجه إلى إصلاح وإعادة هيكلة (Refactoring). ومع ذلك، طالما أن البرنامج يعمل بشكل جيد ويؤدي الغرض، فلا داعي لتعقيد الكود أكثر من اللازم، خاصة أنه مشروع أُنشئ بالأساس لغرض التعلم.
 
+## 📌 إصدار البرنامج
+
+* **الإصدار الحالي:** `1.50`
+* **البيئة المستهدفة:** تم الاعتماد على ميزات واجهة **GNOME 50** (`gtk4` features `gnome_50`) المتوافقة مع إصدار فيدورا لينكس المستقر الحالي.
+
+  
 
 ## 🛠️ Building and Installation
 

@@ -67,3 +67,14 @@ Ensure you have the following installed:
    ```bash
    sudo meson install -C build
    ```
+
+
+# Screenshots
+
+![Alt text](https://raw.githubusercontent.com/yucefsourani/tuxrigup/main/Screenshot1.png "Screenshot")
+
+![Alt text](https://raw.githubusercontent.com/yucefsourani/tuxrigup/main/Screenshot2.png "Screenshot")
+
+![Alt text](https://raw.githubusercontent.com/yucefsourani/tuxrigup/main/Screenshot3.png "Screenshot")
+
+![Alt text](https://raw.githubusercontent.com/yucefsourani/tuxrigup/main/Screenshot4.png "Screenshot")

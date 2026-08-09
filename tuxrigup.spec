@@ -11,11 +11,16 @@ BuildRequires:  meson
 BuildRequires:  gcc
 BuildRequires:  cargo
 BuildRequires:  rust
+BuildRequires:  gettext
+BuildRequires:  pkgconfig(openssl)
 BuildRequires:  pkgconfig(gtk4)
 BuildRequires:  pkgconfig(libadwaita-1)
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  desktop-file-utils
 BuildRequires:  libappstream-glib
 
+Requires:       hicolor-icon-theme
 Requires:       gtk4
 Requires:       libadwaita
 

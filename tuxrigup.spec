@@ -25,7 +25,7 @@ Requires:       gtk4
 Requires:       libadwaita
 
 %description
-The Essential Post-Setup & Workstation Tuning Suite for Linux.
+The Essential Post-Setup & Workstation Tuning Suite for Fedora Linux.
 TuxRigUp provides a comprehensive suite of utilities for configuring
 and optimizing your Linux workstation.
 

@@ -31,7 +31,15 @@ As a result, there is certainly room for refactoring and code cleanup. However, 
 * **الإصدار الحالي:** `1.50`
 * **البيئة المستهدفة:** تم الاعتماد على ميزات واجهة **GNOME 50** (`gtk4` features `gnome_50`) المتوافقة مع إصدار فيدورا لينكس المستقر الحالي.
 
+
   
+## Install (Copr Repo)
+
+```bash
+sudo dnf copr enable youssefmsourani/tuxrigup  -y
+sudo dnf install tuxrigup -y
+```
+
 
 ## 🛠️ Building and Installation
 

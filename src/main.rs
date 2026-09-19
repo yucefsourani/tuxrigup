@@ -22,7 +22,7 @@ pub static CONFIGDIR: OnceLock<String> = OnceLock::new();
 pub static HOMEDIR: OnceLock<String> = OnceLock::new();
 pub static DOWNLOADSDIR: OnceLock<String> = OnceLock::new();
 pub const  CURRENT_ARCH: &str = std::env::consts::ARCH;
-pub const  VERSION: &str = "1.50";
+pub const  VERSION: &str = "1.51";
 
 pub const CSS: &str  = "
 .wait-action-button,

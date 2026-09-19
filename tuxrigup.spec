@@ -1,5 +1,5 @@
 Name:           tuxrigup
-Version:        1.50
+Version:        1.51
 Release:        1%{?dist}
 Summary:        The Essential Post-Setup & Workstation Tuning Suite for Linux
 
@@ -55,5 +55,8 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/com.githu
 %{_datadir}/tuxrigup/
 
 %changelog
+* Sat Sep 19 2026 Yucef Sourani <yucef.m.sourani@gmail.com> - 1.51-1
+- V1.51 For Fedora 45.
+
 * Thu Jul 30 2026 Yucef Sourani <yucef.m.sourani@gmail.com> - 1.50-1
 - Initial release.

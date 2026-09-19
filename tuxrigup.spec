@@ -7,6 +7,12 @@ License:        GPL-3.0-or-later
 URL:            https://github.com/yucefsourani/tuxrigup
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
+Obsoletes:      luniversalinstaller
+Provides:       luniversalinstaller
+Conflicts:      luniversalinstaller
+Obsoletes:      arfedora-welcome
+Provides:       arfedora-welcome
+Conflicts:      arfedora-welcome
 BuildRequires:  meson
 BuildRequires:  gcc
 BuildRequires:  cargo

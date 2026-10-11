@@ -194,6 +194,7 @@ pub fn get_all_plugins() -> Vec<Box<dyn baseplugin::base::PluginTools>> {
         Box::new(plugins::sublime_flatpak::get_plugin()),
         Box::new(plugins::tailscale_fedora::get_plugin()),
         Box::new(plugins::gnome_primary_paste::get_plugin()),
+        Box::new(plugins::visual_studio_code_fedora::get_plugin()),
 
         ]
 }

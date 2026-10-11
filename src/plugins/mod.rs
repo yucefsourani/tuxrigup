@@ -77,3 +77,4 @@ pub mod virtualbox_fedora;
 pub mod vivaldi_fedora;
 pub mod vlc_fedora;
 pub mod gnome_primary_paste;
+pub mod visual_studio_code_fedora;
